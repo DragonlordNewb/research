@@ -5,4 +5,8 @@ from stem1 import constants
 
 @Metric.register("MyMetric", "MyOtherMetric")
 class M(Metric):
-	pass
+	def contraction():
+		pass
+	
+	def dilation():
+		pass

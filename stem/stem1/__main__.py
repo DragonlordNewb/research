@@ -27,13 +27,7 @@ while True:
 
 				case ("--list", "metrics"):
 					print("Getting list of available metrics ...")
-					try:
-						metrics = list(engine.Metric.REGISTRATIONS.keys())
-						for metric in metrics:
-							if not issubclass(metric, engine.Metric):
-								raise TypeError
-					except:
-						print(colors.fg.red + "Error: could not get list of metrics." + colors.reset)
+					metrics = list(engine.Metric.REGISTRATIONS.keys())=
 					print(colors.fg.lime + "List of available metrics acquired:" + colors.reset)
 					for metric in metrics:
-						print(metric)
+						print("  " + metric)
