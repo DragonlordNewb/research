@@ -152,8 +152,16 @@ class LinearGravitational(Force):
 
 # ===== Spacetime ===== #
 
-class Metric:
+class Metric(ABC):
 	def __init__(self):
+		pass
+		
+	@abstracmethod
+	def dilation(self, *args):
+		pass
+		
+	@abstractmethod
+	def contraction(self, *args):
 		pass
 
 class Spacetime:
