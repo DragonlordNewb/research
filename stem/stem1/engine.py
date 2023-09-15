@@ -17,6 +17,8 @@ from typing import Iterable
 
 from random import randbytes
 
+from stem1 import constants
+
 Scalar = Union[float, int]
 
 class Vec3:
