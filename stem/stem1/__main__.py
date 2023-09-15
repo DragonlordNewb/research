@@ -16,6 +16,11 @@ ts: float = None
 mt: engine.Metric = None
 forces: list[engine.Force] = []
 
+def stylizeBool(b: bool) -> str:
+	if b:
+		return colors.fg.lime + "true" + colors.reset
+	return colors.fg.lime + "false" + colors.reset
+
 while True:
 	usr = input(" > ")
 	match usr.split(" "):
@@ -34,6 +39,10 @@ while True:
 					print(colors.fg.lime + "List of available metrics acquired:" + colors.reset)
 					for metric in metrics:
 						print("  " + metric)
+
+				case ("--status", *_):
+					print("System status:")
+					print("  Spacetime initialized: " + stylizeBool(st != None))
 
 		case ("config", *args):
 			match args:
