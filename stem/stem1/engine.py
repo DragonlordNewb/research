@@ -132,23 +132,6 @@ class Force(ABC):
 	@abstractmethod
 	def act(self, a: Object, b: Object) -> tuple[Vec3, Vec3]:
 		raise NotImplementedError
-	
-class LinearGravitational(Force):
-	def act(self, a: Object, b: Object) -> tuple[Vec3, Vec3, Vec3, Vec3]:
-		# return a (lin. accel 1, ang. accel 1, lin. accel 2, ang. accel 2)
-		massA, massB = a.energy / constants.c2, b.energy / constants.c2
-		dist = Vec3.distance(a.linearPosition, b.linearPosition).magnitude
-		divisor = 1 / (dist ** 2)
-		
-		normalA = Vec3(a.x - b.x, a.y - b.y, a.z - b.z).normal()
-		normalB = Vec3(b.x - a.x, b.y - a.y, b.z - a.z).normal()
-		
-		return (
-			normalA.scale(divisor * massB * constants.G),
-			Vec3.zero(),
-			normalB.scale(divisor * massA * constants.G),
-			Vec3.zero()
-		)
 
 # ===== Spacetime ===== #
 
@@ -156,7 +139,7 @@ class Metric(ABC):
 	def __init__(self):
 		pass
 		
-	@abstracmethod
+	@abstractmethod
 	def dilation(self, *args):
 		pass
 		
