@@ -119,13 +119,12 @@ class Object:
 	def center(self) -> Vec3:
 		return Vec3.mean(*self.points())
 
-	@classmethod
-	def register(cls, *names):
+	def register(*names):
 		def decorator(arg):
 			for name in names:
-				cls.METRICS[name] = arg
+				Object.REGISTRATIONS[name] = arg
 			return
-		return cls
+		return decorator
 
 class Particle(Object):
 	def points(self) -> tuple[Vec3]:
@@ -156,13 +155,12 @@ class Metric:
 	def contraction(self, *args):
 		pass
 
-	@classmethod
-	def register(cls, *names):
+	def register(*names):
 		def decorator(arg):
 			for name in names:
-				cls.METRICS[name] = arg
+				Metric.REGISTRATIONS[name] = arg
 			return
-		return cls
+		return decorator
 
 class Spacetime:
 	def __init__(self, metric: Metric, *forces: tuple[Force], step: Scalar=0.00001) -> None:
