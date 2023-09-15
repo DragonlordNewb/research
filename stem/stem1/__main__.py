@@ -32,7 +32,6 @@ while True:
 								raise TypeError
 					except:
 						print(colors.fg.red + "Error: could not get list of metrics." + colors.reset)
-						return
 					print(colors.fg.lime + "List of available metrics acquired:" + colors.reset)
 					for metric in metrics:
 						print(metric)
