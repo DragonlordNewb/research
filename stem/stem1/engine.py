@@ -63,6 +63,12 @@ class Vec3:
 	
 	# Miscellaneous
 
+	@cache
+	@classmethod
+	def zero(cls) -> "Vec3":
+		return cls(0, 0, 0)
+
+	@cache
 	def normal(self) -> "Vec3":
 		return Vec3(
 			x=self.x / self.magnitude,
@@ -124,10 +130,22 @@ class Force(ABC):
 	def act(self, a: Object, b: Object) -> tuple[Vec3, Vec3]:
 		raise NotImplementedError
 	
-class Gravitional(Force):
+class LinearGravitational(Force):
 	def act(self, a: Object, b: Object) -> tuple[Vec3, Vec3, Vec3, Vec3]:
-		# return an (lin. accel 1, ang. accel 1, lin. accel 2, ang. accel 2)
-		pass
+		# return a (lin. accel 1, ang. accel 1, lin. accel 2, ang. accel 2)
+		massA, massB = a.energy / constants.c2, b.energy / constants.c2
+		dist = Vec3.distance(a.linearPosition, b.linearPosition).magnitude
+		divisor = 1 / (dist ** 2)
+		
+		normalA = Vec3(a.x - b.x, a.y - b.y, a.z - b.z).normal()
+		normalB = Vec3(b.x - a.x, b.y - a.y, b.z - a.z).normal()
+		
+		return (
+			normalA.scale(divisor * massB * constants.G),
+			Vec3.zero(),
+			normalB.scale(divisor * massA * constants.G),
+			Vec3.zero()
+		)
 
 # ===== Spacetime ===== #
 
@@ -153,10 +171,10 @@ class Spacetime:
 						lin1, ang1, lin2, ang2 = force.act(object1, object2)
 						for object, lin, ang in [(object1, lin1, ang1), (object2, lin2, ang2)]:
 							dilation = metric.dilation(self, object)
-							object.linearVelocity += lin * self.step * dilation
-							object.angularVelocity += ang * self.step * dilation
+							object.linearVelocity += lin.scale(self.step * dilation)
+							object.angularVelocity += ang.scale(self.step * dilation)
 
-							object.linearPosition += object.linearVelocity * self.step * dilation
-							object.angularPosition += object.angularVelocity * self.step * dilation
+							object.linearPosition += object.linearVelocity.scale(self.step * dilation)
+							object.angularPosition += object.angularVelocity.scale(self.step * dilation)
 
 							object.energy = metric.energy(object)
