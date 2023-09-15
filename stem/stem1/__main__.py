@@ -19,7 +19,7 @@ forces: list[engine.Force] = []
 def stylizeBool(b: bool) -> str:
 	if b:
 		return colors.fg.lime + "true" + colors.reset
-	return colors.fg.lime + "false" + colors.reset
+	return colors.fg.red + "false" + colors.reset
 
 while True:
 	usr = input(" > ")
