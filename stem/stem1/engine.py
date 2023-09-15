@@ -93,6 +93,8 @@ class Vec3:
 # ===== Objects ===== #
 
 class Object(ABC):
+	REGISTRATIONS = {}
+
 	def __init__(self, name: str, energy: Scalar=1, charge: Scalar=0, **kwargs: dict[str, Any]) -> None:
 		self.name = name
 		self.energy, self.charge = energy, charge
@@ -118,6 +120,14 @@ class Object(ABC):
 	def center(self) -> Vec3:
 		return Vec3.mean(*self.points())
 
+	@classmethod
+	def register(cls, *names):
+		def decorator(arg):
+			for name in names:
+				cls.METRICS[name] = arg
+			return
+		return cls
+
 class Particle(Object):
 	def points(self) -> tuple[Vec3]:
 		return self.linearPosition
@@ -136,6 +146,8 @@ class Force(ABC):
 # ===== Spacetime ===== #
 
 class Metric(ABC):
+	REGISTRATIONS = {}
+
 	def __init__(self):
 		pass
 		
@@ -146,6 +158,14 @@ class Metric(ABC):
 	@abstractmethod
 	def contraction(self, *args):
 		pass
+
+	@classmethod
+	def register(cls, *names):
+		def decorator(arg):
+			for name in names:
+				cls.METRICS[name] = arg
+			return
+		return cls
 
 class Spacetime:
 	def __init__(self, metric: Metric, *forces: tuple[Force], step: Scalar=0.00001) -> None:

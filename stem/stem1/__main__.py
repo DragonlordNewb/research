@@ -20,5 +20,19 @@ while True:
 
 		case ("sys", command, *args):
 			match [command] + list(args):
-				case ("version", *_):
+				case ("--version", *_):
 					print("This is " + colors.fg.lime + "Space-Time Engineering Miniature version " + VERSION + colors.reset + ".")
+
+				case ("--list", "metrics"):
+					print("Getting list of available metrics ...")
+					try:
+						metrics = list(engine.Metric.REGISTRATIONS.keys())
+						for metric in metrics:
+							if not issubclass(metric, engine.Metric):
+								raise TypeError
+					except:
+						print(colors.fg.red + "Error: could not get list of metrics." + colors.reset)
+						return
+					print(colors.fg.lime + "List of available metrics acquired:" + colors.reset)
+					for metric in metrics:
+						print(metric)
