@@ -163,7 +163,11 @@ class Spacetime:
 	def __iter__(self) -> Iterable[Object]:
 		return iter(self.objects)
 
-	def tick(self) -> None:
+	def tick(self, iterations: int=1) -> None:
+		if iterations != 1:
+			for _ in range(iterations - 1):
+				self.tick(iterations=1)
+				
 		for object1 in self:
 			for object2 in self:
 				if object1 != object2:
