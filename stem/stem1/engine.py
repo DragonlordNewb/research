@@ -65,8 +65,8 @@ class Vec3:
 	
 	# Miscellaneous
 
-	@cache
 	@classmethod
+	@cache
 	def zero(cls) -> "Vec3":
 		return cls(0, 0, 0)
 
