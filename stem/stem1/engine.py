@@ -17,6 +17,8 @@ from typing import Iterable
 
 from random import randbytes
 
+from time import time as epoch
+
 from stem1 import constants
 
 Scalar = Union[float, int]
@@ -91,7 +93,8 @@ class Vec3:
 # ===== Objects ===== #
 
 class Object(ABC):
-	def __init__(self, energy: Scalar=1, charge: Scalar=0, **kwargs: dict[str, Any]) -> None:
+	def __init__(self, name: str, energy: Scalar=1, charge: Scalar=0, **kwargs: dict[str, Any]) -> None:
+		self.name = name
 		self.energy, self.charge = energy, charge
 		self.baseEnergy = energy
 		self.linearPosition = Vec3(0, 0, 0)
@@ -162,11 +165,17 @@ class Spacetime:
 
 	def __iter__(self) -> Iterable[Object]:
 		return iter(self.objects)
+		
+	def __getitem__(self, name: str) -> Object:
+		for obj in self:
+			if obj.name == name:
+				return obj
+		raise KeyError("No object with name " + repr(name) + ".")
 
-	def tick(self, iterations: int=1) -> None:
+	def run(self, iterations: int=1) -> None:
 		if iterations != 1:
 			for _ in range(iterations - 1):
-				self.tick(iterations=1)
+				self.run(iterations=1)
 				
 		for object1 in self:
 			for object2 in self:
@@ -182,3 +191,15 @@ class Spacetime:
 							object.angularPosition += object.angularVelocity.scale(self.step * dilation)
 
 							object.energy = metric.energy(object)
+	def runFor(self, time: Scalar) -> None:
+		st = epoch()
+		et = st + time
+		while epoch() < et:
+			self.run(1)
+
+	def add(self, obj: Object, linearPosition: Vec3=Vec3.zero(),angularPosition: Vec3=Vec3.zero(), linearVelocity: Vec3=Vec3.zero(), angularVelocity: Vec3=Vec3.zero()) -> None:
+		self.objects.append(obj)
+		self[obj.name].linearPosition = linearPosition
+		self[obj.name].angularPosition = angularPosition
+		self[obj.name].linearVelocity = linearVelocity
+		self[obj.name].angularVelocity = angularVelocity
