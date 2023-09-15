@@ -143,7 +143,7 @@ class Spacetime:
 					for force in self.forces:
 						lin1, ang1, lin2, ang2 = force.act(object1, object2)
 						for object, lin, ang in [(object1, lin1, ang1), (object2, lin2, ang2)]:
-							dilation = metric.dilation(object)
+							dilation = metric.dilation(self, object)
 							object.linearVelocity += lin * self.step * dilation
 							object.angularVelocity += ang * self.step * dilation
 
