@@ -59,7 +59,16 @@ class Vec3:
 	def angle(self, other) -> Scalar:
 		return acos((self * other) / (self.magnitude() * other.magnitude()))
 	
-	# Scaling
+	# Miscellaneous
+
+	@classmethod
+	def mean(cls, *vectors: tuple["Vec3"]) -> "Vec3":
+		l = len(vectors)
+		return cls(
+			x=sum([v.x for v in vectors]) / l,
+			y=sum([v.y for v in vectors]) / l,
+			z=sum([v.z for v in vectors]) / l
+		)
 
 	def scale(self, factor: Scalar) -> "Vec3":
 		return Vec3(x * factor, y * factor, z * factor)
@@ -85,8 +94,15 @@ class Object(ABC):
 		return not (self == other)
 
 	@abstractmethod
-	def points(self) -> None:
+	def points(self) -> Iterable[Vec3]:
 		raise NotImplementedError
+
+	def center(self) -> Vec3:
+		return Vec3.mean(*self.points())
+
+class Particle(Object):
+	def points(self) -> tuple[Vec3]:
+		return self.linearPosition
 
 # ===== Forces ===== #
 
@@ -107,7 +123,8 @@ class Gravitional(Force):
 # ===== Spacetime ===== #
 
 class Metric:
-	def __init__(self)
+	def __init__(self):
+		pass
 
 class Spacetime:
 	def __init__(self, metric: Metric, *forces: tuple[Force], step: Scalar=0.00001) -> None:
