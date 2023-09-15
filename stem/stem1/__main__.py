@@ -21,8 +21,6 @@ while True:
 		case ("sys", command, *args):
 			match [command] + list(args):
 				case ("--version", *_):
-					if len(_) > 0:
-						print(colors.fg.yellow + "Bad args " + ", ".join(_) + " ignored." + colors.reset)
 					print("This is " + colors.fg.lime + "Space-Time Engineering Miniature version " + VERSION + colors.reset + ".")
 
 				case ("--list", "metrics"):
