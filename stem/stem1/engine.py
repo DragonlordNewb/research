@@ -184,11 +184,12 @@ class Spacetime:
 						lin1, ang1, lin2, ang2 = force.act(object1, object2)
 						for object, lin, ang in [(object1, lin1, ang1), (object2, lin2, ang2)]:
 							dilation = metric.dilation(self, object)
+							contraction = metric.contraction(self, object)
 							object.linearVelocity += lin.scale(self.step * dilation)
 							object.angularVelocity += ang.scale(self.step * dilation)
 
-							object.linearPosition += object.linearVelocity.scale(self.step * dilation)
-							object.angularPosition += object.angularVelocity.scale(self.step * dilation)
+							object.linearPosition += object.linearVelocity.scale(self.step * dilation / contraction)
+							object.angularPosition += object.angularVelocity.scale(self.step * dilation / contraction)
 
 							object.energy = metric.energy(object)
 	def runFor(self, time: Scalar) -> None:
