@@ -1,3 +1,7 @@
+# Space-Time Engineering Miniature.
+
+VERSION = "1.0.0"
+
 print("Loading STEM1 ...")
 
 from stem1 import *
@@ -12,3 +16,9 @@ while True:
 	match usr.split(" "):
 		case ("exit", *_):
 			print(colors.fg.red + "Exiting ..." + colors.reset)
+			exit(0)
+
+		case ("sys", command, *args):
+			match [command] + list(args):
+				case ("version", *_):
+					print("This is " + colors.fg.lime + "Space-Time Engineering Miniature version " + VERSION + colors.reset + ".")
