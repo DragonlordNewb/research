@@ -109,8 +109,7 @@ class Gravitional(Force):
 class Metric:
 	def __init__(self)
 
-class NonRelativisticSpacetime:
-	# non-relativistic meaning v<<c
+class Spacetime:
 	def __init__(self, metric: Metric, *forces: tuple[Force], step: Scalar=0.00001) -> None:
 		self.objects = []
 		self.step = step
