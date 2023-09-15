@@ -92,7 +92,7 @@ class Vec3:
 
 # ===== Objects ===== #
 
-class Object(ABC):
+class Object:
 	REGISTRATIONS = {}
 
 	def __init__(self, name: str, energy: Scalar=1, charge: Scalar=0, **kwargs: dict[str, Any]) -> None:
@@ -113,7 +113,6 @@ class Object(ABC):
 	def __neq__(self, other) -> bool:
 		return not (self == other)
 
-	@abstractmethod
 	def points(self) -> Iterable[Vec3]:
 		raise NotImplementedError
 
@@ -145,17 +144,15 @@ class Force(ABC):
 
 # ===== Spacetime ===== #
 
-class Metric(ABC):
+class Metric:
 	REGISTRATIONS = {}
 
 	def __init__(self):
 		pass
 		
-	@abstractmethod
 	def dilation(self, *args):
 		pass
 		
-	@abstractmethod
 	def contraction(self, *args):
 		pass
 
