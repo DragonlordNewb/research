@@ -63,6 +63,13 @@ class Vec3:
 	
 	# Miscellaneous
 
+	def normal(self) -> "Vec3":
+		return Vec3(
+			x=self.x / self.magnitude,
+			y=self.y / self.magnitude,
+			z=self.z / self.magnitude
+		)
+
 	@classmethod
 	def mean(cls, *vectors: tuple["Vec3"]) -> "Vec3":
 		l = len(vectors)
