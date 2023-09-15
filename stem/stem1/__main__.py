@@ -27,7 +27,7 @@ while True:
 
 				case ("--list", "metrics"):
 					print("Getting list of available metrics ...")
-					metrics = list(engine.Metric.REGISTRATIONS.keys())=
+					metrics = list(engine.Metric.REGISTRATIONS.keys())
 					print(colors.fg.lime + "List of available metrics acquired:" + colors.reset)
 					for metric in metrics:
 						print("  " + metric)
