@@ -1,3 +1,5 @@
 from aster import *
 
-color = utils.Colors()
+cpt = utils.Colors() # Color printer!
+
+cpt("Loading ...", cpt.fg.yellow)

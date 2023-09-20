@@ -36,3 +36,6 @@ class Colors:
 		purple = '\033[45m'
 		cyan = '\033[46m'
 		lightgrey = '\033[47m'
+
+	def __call__(self, text: str, *effects: tuple[str]) -> str:
+		print("".join(effects) + text + self.reset)
