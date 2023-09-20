@@ -1,7 +1,7 @@
 
 # yes a horrible abuse of classes i know but the syntax is prettier
 
-class Colors:
+class ColorPrinter:
 	reset = '\033[0m'
 	bold = '\033[01m'
 	disable = '\033[02m'
@@ -37,5 +37,5 @@ class Colors:
 		cyan = '\033[46m'
 		lightgrey = '\033[47m'
 
-	def __call__(self, text: str, *effects: tuple[str]) -> str:
-		print("".join(effects) + text + self.reset)
+	def __call__(self, text: str, *effects: tuple[str], end="\n") -> str:
+		print("".join(effects) + text + self.reset, end=end)
