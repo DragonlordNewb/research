@@ -36,7 +36,7 @@ while True:
 			case ("sys", "version"):
 				cpt("This is Advanced SpaceTime Engineering Research software version " + __version__ + ".")
 
-			case *:
+			case _:
 				cpt("Invalid command", cpt.fg.red)
 
 	except KeyboardInterrupt:
