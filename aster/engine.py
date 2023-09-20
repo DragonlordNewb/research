@@ -227,7 +227,7 @@ class Spacetime:
 		self.objects = []
 		self.forces = forces
 
-	def __iter__(self) -> Iterable[Object]:
+	def __iter__(self) -> Iterable[Body]:
 		return iter(self.objects)
 
 	def update(self, times: int=1) -> None:
