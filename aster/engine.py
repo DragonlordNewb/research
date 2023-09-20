@@ -104,10 +104,8 @@ class Body(ABC):
 	Functionally approximated as a set of point masses.
 	"""
 
-	linearLocation  = Vector.zero()
-	angularLocation = Vector.zero()
-	linearVelocity  = Vector.zero()
-	angularLocation = Vector.zero()
+	location = Vector.zero()
+	velocity = Vector.zero()
 
 	@abstractmethod
 	def points(self) -> Iterable[PointMass]:
