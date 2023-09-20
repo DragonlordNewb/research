@@ -36,6 +36,9 @@ while True:
 			case ("sys", "version"):
 				cpt("This is Advanced SpaceTime Engineering Research software version " + __version__ + ".")
 
+			case ("sys", "list", "metrics"):
+				cpt("")
+
 			case _:
 				cpt("Invalid command", cpt.fg.red)
 
