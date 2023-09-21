@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -29,6 +30,10 @@ class Vector {
 			float zn = z + obj.z; 
 			return Vector(xn, yn, zn);
 		}
+
+		float magnitude() {
+			return sqrt(powf(x, 2), powf(y, 2), powf(z, 2));
+		}
 };
 
 int main(int argc, char* argv[]) {
@@ -37,5 +42,5 @@ int main(int argc, char* argv[]) {
 	Vector v1 = Vector(0, 1, 0);
 	Vector v2 = Vector(1, 0, 0);
 	Vector v3 = v1 + v2;
-	cout << v3.x;
+	cout << v3.magnitude();
 }
