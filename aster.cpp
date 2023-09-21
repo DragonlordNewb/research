@@ -31,6 +31,13 @@ class Vector {
 			return Vector(xn, yn, zn);
 		}
 
+		Vector operator*(long double f) {
+			long double xn = x * f;
+			long double yn = y * f;
+			long double zn = z * f;
+			return Vector(xn, yn, zn);
+		}
+
 		long double magnitude() {
 			return sqrt(powf(x, 2) + powf(y, 2) + powf(z, 2));
 		}
