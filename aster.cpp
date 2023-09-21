@@ -81,8 +81,6 @@ class Body {
 		}
 };
 
-//           
-
 // EXPANDED CLASSES
 
 int main(int argc, char* argv[]) {
