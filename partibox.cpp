@@ -2,6 +2,8 @@
 
 using namespace std;
 
+// UTILITIES 
+
 class Vector {
 	private:
 		float x;
@@ -15,20 +17,21 @@ class Vector {
 		}
 
 		Vector operator+(Vector const& obj) {
-			xn = x + obj.x;
-			yn = y + obj.y;
-			zn = z + obj.z; 
+			float xn = x + obj.x;
+			float yn = y + obj.y;
+			float zn = z + obj.z; 
 			return Vector(xn, yn, zn);
 		}
 
 		Vector operator-(Vector const& obj) {
-			xn = x + obj.x;
-			yn = y + obj.y;
-			zn = z + obj.z; 
+			float xn = x + obj.x;
+			float yn = y + obj.y;
+			float zn = z + obj.z; 
 			return Vector(xn, yn, zn);
 		}
 };
 
-int main() {
+int main(int argc, char* argv[]) {
 	cout << "Hello World";
+	cout << argv[0];
 }
