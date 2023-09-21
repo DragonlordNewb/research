@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 		char inp[256];
 		string cmd[256];
 		for (char i = 0; i < 100; i++) {
-			cmd[i] = 0;
+			cmd[i] = "";
 			inp[i] = 0;
 		}
 		
