@@ -132,6 +132,7 @@ class Body(ABC):
 
 	location = Vector.zero()
 	velocity = Vector.zero()
+	experiencedTime = 0
 
 	def __init__(self, **kwargs: dict[str, Any]) -> None:
 		for key in kwargs.keys():
@@ -265,3 +266,4 @@ class Spacetime:
 		for body in self:
 			body.velocity += correctedAccelerations[body]
 			body.location += body.velocity * self.metric.spaceContraction(body)
+			body.experiencedTime += self.step * self.metric.timeDilation(body)
