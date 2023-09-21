@@ -91,7 +91,12 @@ int main(int argc, char* argv[]) {
 	cout << "ASTER loaded.\n";
 
 	while (true) {
+		cout << " > ";
+
 		char cmd[100];
+		for (char i = 0; i < 100; i++) {
+			cmd[i] = 0;
+		}
 		
 		cin.getline(cmd, 100); 
 		char separator = ' ';
@@ -108,6 +113,6 @@ int main(int argc, char* argv[]) {
 			i++;
 		}
 
-		cout << cmd[0] << cmd[1] << cmd[2];
+		cout << cmd[0] << cmd[1] << cmd[2] << "\n";
 	}
 }
