@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
 		cout << " > ";
 
 		char inp[256];
-		char cmd[256];
+		string cmd[256];
 		for (char i = 0; i < 100; i++) {
 			cmd[i] = 0;
 			inp[i] = 0;
