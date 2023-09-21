@@ -46,6 +46,8 @@ class Vector {
 		}
 };
 
+// BASE CLASSES
+
 class Atom {
 	public:
 		double energy;
@@ -79,11 +81,33 @@ class Body {
 		}
 };
 
+//           
+
+// EXPANDED CLASSES
+
 int main(int argc, char* argv[]) {
 	cout << "Advanced SpaceTime Simulation Software starting up ...\n";
 
-	Vector v1 = Vector(0, 1, 0);
-	Vector v2 = Vector(1, 0, 0);
-	Vector v3 = v1 + v2;
-	cout << v3.magnitude();
+	cout << "ASTER loaded.\n";
+
+	while (true) {
+		char cmd[100];
+		
+		cin.getline(cmd, 100); 
+		char separator = ' ';
+		int i = 0;
+		
+		string s; 
+		while (cmd[i] != '\0') {
+			if (cmd[i] != separator) {
+				s += cmd[i]; 
+			} else {
+				cout << s << endl;
+				s.clear();
+			}
+			i++;
+		}
+
+		cout << cmd[0] << cmd[1] << cmd[2];
+	}
 }
