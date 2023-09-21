@@ -18,3 +18,7 @@ class RelativisticMinkowski(engine.Metric):
 	
 	def spaceContraction(self, body: engine.Body) -> float:
 		return 1 / sqrt(1 - ((body.velocity.magnitude() ** 2) / constants.c2))
+	
+engine.Metric.register("Schwarzschild", "S")
+class Schwarzschild(engine.metric):
+	def timeDilation(self, body: engine.Body) -> float:
