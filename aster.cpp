@@ -32,6 +32,10 @@ class Vector {
 };
 
 int main(int argc, char* argv[]) {
-	cout << "Hello World";
-	cout << argv[0];
+	cout << "Advanced SpaceTime Simulation Software starting up ...\n";
+
+	Vector v1 = Vector(0, 1, 0);
+	Vector v2 = Vector(1, 0, 0);
+	Vector v3 = v1 + v2;
+	cout << Vector.x;
 }
