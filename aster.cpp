@@ -93,21 +93,23 @@ int main(int argc, char* argv[]) {
 	while (true) {
 		cout << " > ";
 
-		char cmd[100];
+		char inp[256];
+		char cmd[256];
 		for (char i = 0; i < 100; i++) {
 			cmd[i] = 0;
+			inp[i] = 0;
 		}
 		
-		cin.getline(cmd, 100); 
+		cin.getline(inp, 100); 
 		char separator = ' ';
 		int i = 0;
 		
 		string s; 
-		while (cmd[i] != '\0') {
-			if (cmd[i] != separator) {
-				s += cmd[i]; 
+		while (inp[i] != '\0') {
+			if (inp[i] != separator) {
+				s += inp[i]; 
 			} else {
-				cout << s << endl;
+				cmd[i] = s;
 				s.clear();
 			}
 			i++;
