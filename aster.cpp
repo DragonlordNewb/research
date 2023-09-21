@@ -32,7 +32,7 @@ class Vector {
 		}
 
 		float magnitude() {
-			return sqrt(powf(x, 2), powf(y, 2), powf(z, 2));
+			return sqrt(powf(x, 2) + powf(y, 2) + powf(z, 2));
 		}
 };
 
