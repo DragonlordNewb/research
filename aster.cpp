@@ -7,39 +7,71 @@ using namespace std;
 
 class Vector {
 	private:
-		long double x;
-		long double y;
-		long double z;
+		double x;
+		double y;
+		double z;
 	public:
-		Vector(long double _x, long double _y, long double _z) {
+		Vector(double _x, double _y, double _z) {
 			x = _x;
 			y = _y;
 			z = _z;
 		}
 
 		Vector operator+(Vector const& obj) {
-			long double xn = x + obj.x;
-			long double yn = y + obj.y;
-			long double zn = z + obj.z; 
+			double xn = x + obj.x;
+			double yn = y + obj.y;
+			double zn = z + obj.z; 
 			return Vector(xn, yn, zn);
 		}
 
 		Vector operator-(Vector const& obj) {
-			long double xn = x + obj.x;
-			long double yn = y + obj.y;
-			long double zn = z + obj.z; 
+			double xn = x + obj.x;
+			double yn = y + obj.y;
+			double zn = z + obj.z; 
 			return Vector(xn, yn, zn);
 		}
 
-		Vector operator*(long double f) {
-			long double xn = x * f;
-			long double yn = y * f;
-			long double zn = z * f;
+		Vector operator*(double f) {
+			double xn = x * f;
+			double yn = y * f;
+			double zn = z * f;
 			return Vector(xn, yn, zn);
 		}
 
-		long double magnitude() {
+		double magnitude() {
 			return sqrt(powf(x, 2) + powf(y, 2) + powf(z, 2));
+		}
+};
+
+class Atom {
+	public:
+		double energy;
+		double charge;
+		Vector location;
+
+		Atom(double _energy, double _charge, Vector _location) {
+			energy = _energy;
+			charge = _charge;
+			location = _location;
+		}
+};
+
+class Body {
+	protected:
+		double energy;
+		double charge;
+		Vector location;
+		Vector velocity;
+	public:
+		Body(double _energy, double _charge, Vector _location, Vector _velocity) {
+			energy = _energy;
+			charge = _charge;
+			location = _location;
+			velocity = _velocity;
+		}
+
+		Atom points() {
+			throw invalid_argument("Can\'t use a base Body class for this.");
 		}
 };
 
