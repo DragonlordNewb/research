@@ -7,31 +7,31 @@ using namespace std;
 
 class Vector {
 	private:
-		float x;
-		float y;
-		float z;
+		long double x;
+		long double y;
+		long double z;
 	public:
-		Vector(float _x, float _y, float _z) {
+		Vector(long double _x, long double _y, long double _z) {
 			x = _x;
 			y = _y;
 			z = _z;
 		}
 
 		Vector operator+(Vector const& obj) {
-			float xn = x + obj.x;
-			float yn = y + obj.y;
-			float zn = z + obj.z; 
+			long double xn = x + obj.x;
+			long double yn = y + obj.y;
+			long double zn = z + obj.z; 
 			return Vector(xn, yn, zn);
 		}
 
 		Vector operator-(Vector const& obj) {
-			float xn = x + obj.x;
-			float yn = y + obj.y;
-			float zn = z + obj.z; 
+			long double xn = x + obj.x;
+			long double yn = y + obj.y;
+			long double zn = z + obj.z; 
 			return Vector(xn, yn, zn);
 		}
 
-		float magnitude() {
+		long double magnitude() {
 			return sqrt(powf(x, 2) + powf(y, 2) + powf(z, 2));
 		}
 };
