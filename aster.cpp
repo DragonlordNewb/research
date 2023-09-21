@@ -11,6 +11,9 @@ class Vector {
 		double y;
 		double z;
 	public:
+
+		Vector() : x(0.0), y(0.0), z(0.0) {}
+		
 		Vector(double _x, double _y, double _z) {
 			x = _x;
 			y = _y;
@@ -25,9 +28,9 @@ class Vector {
 		}
 
 		Vector operator-(Vector const& obj) {
-			double xn = x + obj.x;
-			double yn = y + obj.y;
-			double zn = z + obj.z; 
+			double xn = x - obj.x;
+			double yn = y - obj.y;
+			double zn = z - obj.z; 
 			return Vector(xn, yn, zn);
 		}
 
@@ -39,7 +42,7 @@ class Vector {
 		}
 
 		double magnitude() {
-			return sqrt(powf(x, 2) + powf(y, 2) + powf(z, 2));
+			return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
 		}
 };
 
@@ -62,6 +65,7 @@ class Body {
 		double charge;
 		Vector location;
 		Vector velocity;
+
 	public:
 		Body(double _energy, double _charge, Vector _location, Vector _velocity) {
 			energy = _energy;
