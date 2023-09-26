@@ -57,6 +57,16 @@ class Vector:
 	def __abs__(self) -> float:
 		return sqrt((self.x ** 2) + (self.y ** 2) + (self.z ** 2))
 
+	def dot(self, other: "Vector") -> Scalar:
+		return (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
+
+	def cross(self, other: "Vector") -> "Vector":
+		return Vector(
+			(self.y * other.z) - (self.z * other.y),
+			(self.x * other.z) - (self.z * other.x),
+			(self.x * other.y) - (self.y * other.x)
+		)
+
 	# misc
 
 	def euclidean(self, other: "Vector") -> Scalar:

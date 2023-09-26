@@ -56,11 +56,20 @@ def executeCommand(usr):
 							executeCommand(cmd)
 					print("Finished executing " + filename + "\".")
 
-			case ("clear", *_):
-				print("\n" * 500)
+			case ("list", "metrics"):
+				print("Listing available metrics ...")
+				for metric in Metric.METRICS.keys():
+					print("  " + metric)
 
-			case ("cls", *_):
-				print("\n" * 500)
+			case ("list", "forces"):
+				print("Listing available forces ...")
+				for force in Force.FORCES.keys():
+					print("  " + force)
+
+			case ("list", "bodies"):
+				print("Listing available body types ...")
+				for body in Body.BODIES.keys():
+					print("  " + body)
 
 			case _:
 				print("Invalid or incomplete command.")

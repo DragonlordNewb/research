@@ -44,7 +44,7 @@ yocto = 10 ** -24
 ronto = 10 ** -27
 quecto = 10 ** -30
 
-Metric.register("Minkowski")
+@Metric.register
 class Minkowski(Metric):
 
 	"""

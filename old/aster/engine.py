@@ -68,6 +68,9 @@ class Body(ABC):
 		self.velocity = Vector(0, 0, 0)
 		self.rotation = Vector(0, 0, 0)
 
+		self.experiencedTime = 0
+		self.experiencedSpace = 0
+
 		self.id = None
 
 		for key in kwargs.keys():
@@ -83,15 +86,17 @@ class Body(ABC):
 	def atoms(self) -> list[Atom]:
 		pass
 
+	def centerOfMass(self) -> Vector:
+		locations = [atom.location for atom in self.atoms()]
+		sum = Vector(0, 0, 0)
+		for location in locations:
+			sum += location
+		return sum / len(locations)
+
 	@staticmethod
-	def register(*names: tuple[str]) -> Callable[[type], type]:
-		def deco(cls):
-			cls.names = []
-			for name in names:
-				Body.BODIES[name] = cls
-				cls.names.append(name)
-			return cls
-		return deco
+	def register(cls) -> type:
+		Body.BODIES[cls.__name__] = cls
+		return cls
 
 	@classmethod
 	def lookup(cls, name: str) -> type:
@@ -140,14 +145,8 @@ class Metric(ABC):
 		return self.integrator.trivariate(self.spaceContraction, a, b)
 
 	@staticmethod
-	def register(*names: tuple[str]) -> Callable[[type], type]:
-		def deco(cls):
-			cls.names = []
-			for name in names:
-				Metric.METRICS[name] = cls
-				cls.names.append(name)
-			return cls
-		return deco
+	def register(cls) -> type:
+		Metric.METRICS[cls.__name__] = cls
 
 	@classmethod
 	def lookup(cls, name: str) -> type:
@@ -176,33 +175,16 @@ class Force(ABC):
 		return False
 
 	@abstractmethod
-	def act(self, a: Atom, b: Atom) -> tuple[Vector, Vector]:
+	def act(self, a: Atom, b: Atom, distance: Scalar) -> tuple[Vector, Vector]:
 		pass
 
 	@staticmethod
-	def register(*names: tuple[str]) -> Callable[[type], type]:
-		def deco(cls) -> type:
-			cls.names = []
-			for name in names:
-				Force.FORCES[name] = cls
-				cls.names.append(name)
-			return cls
-		return deco
+	def register(cls) -> type:
+		Force.FORCES[cls.__name__] = cls
 
 	@classmethod
 	def lookup(cls, name: str) -> type:
 		return cls.FORCES[name]
-
-	def data(self) -> bytes:
-		forceName = ""
-		for name in self.names:
-			if forceName == "" or len(name) < len(forceName):
-				forceName = name
-		forceName = forceName.encode("utf-8")
-		if len(forceName) < 32:
-			forceName += bytes(32 - len(forceName))
-
-		return forceName + pack("!d", self.coupling)
 
 class Spacetime:
 
@@ -265,11 +247,19 @@ class Spacetime:
 				self.forces.pop(i)
 				return
 
-	def render(self, body: Body) -> bytes:
+	def render(self, body: Body, customID=None) -> bytes:
 		self.bodies.append(body)
 		id = randbytes(32)
 		self.bodies[-1].id = id
+		if customID:
+			self.bodies[-1].id = customID
 		return id
+
+	def getBody(self, id) -> Body:
+		for body in self.bodies:
+			if body.id == id:
+				return body
+		raise NameError("No such body.")
 
 	def derender(self, id: bytes) -> Body:
 		i = -1
@@ -293,6 +283,72 @@ class Spacetime:
 			for _ in range(n - 1):
 				self.advance(1)
 
+		for body1 in self.bodies:
+			for body2 in self.bodies:
+				if body1 == body2:
+					continue
+
+				vi1 = body1.velocity
+				vi2 = body2.velocity
+
+				force1 = Vector(0, 0, 0)
+				torque1 = Vector(0, 0, 0)
+				force2 = Vector(0, 0, 0)
+				torque2 = Vector(0, 0, 0)
+
+				center1 = body1.centerOfMass()
+				center2 = body2.centerOfMass()
+
+				for atom1 in body1.atoms():
+					for atom2 in body2.atoms():
+						for force in self.forces:
+							distance = self.metric.distance(atom1.location, atom2.location)
+							f1, f2 = force.act(atom1, atom2, distance)
+							force1 += f1 * self.metric.timeDilation(atom1.location)
+							force2 += f2 * self.metric.timeDilation(atom2.location)
+
+							r1, r2 = atom1.location - center1, atom2.location - center2
+							t1, t2 = Vector.cross(r1, f1), Vector.cross(r2, f2)
+							torque1 += t1 * self.metric.timeDilation(atom1.location)
+							torque2 += t2 * self.metric.timeDilation(atom2.location)
+
+				body1.velocity += force1 / self.resolution
+				body2.velocity += force2 / self.resolution
+				body1.rotation += torque1 / self.resolution
+				body2.rotation += torque2 / self.resolution
+				body1.location += body1.velocity / self.resolution
+				body2.location += body2.velocity / self.resolution
+				body1.angle += body1.rotation / self.resolution
+				body2.angle == body2.rotation / self.resolution
+
+				vf1 = body1.velocity
+				vf2 = body2.velocity
+
+				dS1 = abs(vf1 - vi1)
+				dS2 = abs(vf2 - vi2)
+
+				time1 = []
+				time2 = []
+				space1 = []
+				space2 = []
+
+				for atom in body1.atoms():
+					time1.append(self.metric.timeDilation(atom.location))
+					space1.append(self.metric.spaceContraction(atom.location) * dS1)
+				for atom in body2.atoms():
+					time2.append(self.metric.timeDilation(atom.location))
+					space2.append(self.metric.spaceContraction(atom.location) * dS2)
+
+				experiencedTime1 = sum(time1) / len(time1)
+				experiencedTime2 = sum(time2) / len(time2)
+				experiencedSpace1 = sum(space1) / len(space1)
+				experiencedSpace2 = sum(space2) / len(space2)
+
+				body1.experiencedTime += experiencedTime1 / self.resolution
+				body2.experiencedTime += experiencedTime2 / self.resolution
+				body1.experiencedSpace += experiencedSpace1 / self.resolution
+				body2.experiencedSpace += experiencedSpace2 / self.resolution
+
 		return
 
 	def advanceComputerSeconds(self, n: Scalar) -> None:
@@ -310,37 +366,3 @@ class Spacetime:
 			self.advance(batchSize)
 
 		return
-
-	# static info storage
-
-	@cache
-	def header(self) -> bytes:
-		magic = b"ASTERSDF"
-
-		if self.metric != None:
-			if not hasattr(self.metric, "names"):
-				raise SyntaxError("Currently-equipped Metric (" + type(self.metric).__name__ + ") was not properly registered with a name.")
-			metricName = ""
-			for name in self.metric.names:
-				if metricName == "" or len(name) < len(metricName):
-					metricName = name
-			if metricName == "":
-				raise SyntaxError("Currently-equipped Metric (" + type(self.metric).__name__ + ") was not properly registered with a name.")
-			if len(metricName) > 32:
-				raise SyntaxError("Currently-equipped Metric (" + type(self.metric).__name__ + ") did not have a sufficiently-short name registered.")
-
-			metricName = metricName.encode("utf-8")
-			if len(metricName) < 32:
-				metricName += bytes(32 - len(metricName))
-
-		else:
-			metricName = bytes(32)
-
-		resolution = pack("!Q", self.resolution)
-
-		delimiter = b"THE-WORLD-IS-IN-YOUR-HANDS\x00\x00\x00\x00\x00\x00"
-
-		return magic + metricName + resolution + delimiter
-
-	def data(self) -> bytes:
-		pass
