@@ -16,6 +16,8 @@ Scalar = Union[int, float]
 
 from math import sqrt
 
+from struct import pack
+
 class Vector:
 	def __init__(self, x: float, y: float, z: float) -> None:
 		self.x, self.y, self.z = x, y, z
@@ -63,22 +65,40 @@ class Vector:
 	def normal(self):
 		return self / abs(self)
 
+	def __bytes__(self) -> bytes:
+		return pack("!ddd", self.x, self.y, self.z)
+
+	@classmethod
+	def fromBytes(cls, data: bytes):
+		x, y, z = unpack("!ddd", data)
+		return cls(x, y, z)
+
 class Integrator:
+	# Class to generate monovariate and trivariate Riemann integrals
+
 	def __init__(self, resolution: int=1000) -> None:
 		self.resolution = resolution
 
-	def riemannIntegral(self, f: Callable[[Scalar], Scalar], a: Scalar, b: Scalar) -> Scalar:
+	def monovariate(self, f: Callable[[Scalar], Scalar], a: Scalar, b: Scalar) -> Scalar:
 		dx = (b - a) / self.resolution
 		s = 0
 		for i in range(self.resolution):
 			xi = a + i * dx
-			s += f(xi)
+			s += f(xi) / self.resolution
 		return s
 
-	def fieldLineIntegral(f: Callable[[Vector], Scalar], a: Vector, b: Vector) -> Scalar:
-		dX = Vector.euclidean(a, b)
-		norm = (a - b).normal()
-		p = lambda x: a + (norm * (x * dX))
-		g = lambda x: f(p(x))
+	def trivariate(self, f: Callable[[Vector], Scalar], a: Vector, b: Vector) -> Scalar:
+		stepX = (b.x - a.x) / self.resolution
+		stepY = (b.y - a.y) / self.resolution
+		stepZ = (b.z - a.z) / self.resolution
+		step = abs(Vector(stepX, stepY, stepZ))
 
-		return self.riemannIntegral(p, 0, 1)
+		s = 0
+		for i in range(self.resolution):
+			x = a.x + (stepX * i)
+			y = a.y + (stepY * i)
+			z = a.z + (stepZ * i)
+			v = Vector(x, y, z)
+			s += f(v) * step
+
+		return s
