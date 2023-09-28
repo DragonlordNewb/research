@@ -10,12 +10,15 @@ from math import acos
 
 from functools import cache
 
+from abc import ABC
+from abc import abstractmethod
+
 from typing import Callable
 from typing import Iterable
 from typing import Any
 from typing import Union
 
-# ===== Core components ===== #
+# ===== Core mathematical components ===== #
 
 Scalar = Union[int, float]
 
@@ -197,3 +200,64 @@ class ExtendedCalculus(Calculus):
 		dV = b - a
 		g = lambda x: f(a + x * dV)
 		return self.integrate(g, 0, 1, n)
+
+# ===== Spacetime simulation components ===== #
+
+# === Body class === #
+
+class Atom:
+	def __init__(self, location: Vector, energy: Scalar, **kwargs: dict[str, Any]) -> None:
+		self.location = location
+		self.energy = energy
+		for key in kwargs.keys():
+			setattr(key, self, kwargs[key])
+		self.properties = ["location", "energy"] + list(kwargs.keys())
+
+class Body(ABC):
+	pass
+
+class Field:
+
+	"""
+	Generalized Python representation of a force field, i.e.
+	the electromagnetic field which is a field of virtual photons,
+	the color charge field which is a field of virtual gluons,
+	and the weak field which is a field of virtual W and Z bosons.
+
+	The Field.couple function is used to return the forces applied
+	to particles a and b, respectively.
+	"""
+
+	IGNORE = "ignore"
+	WARN = "warn"
+	ERROR = "error"
+
+	couplingProperties: list[str]
+	decoupledBehavior: str = IGNORE
+
+	def __init__(self, **kwargs) -> None:
+		for key in kwargs.keys():
+			setattr(self, key, kwargs[key])
+
+	def couples(self, atom: Atom) -> bool:
+		for prop in self.couplingProperties:
+			if prop not in atom.properties:
+				return False
+		return True
+
+	@abstractmethod
+	def act(self, a: Atom, b: Atom) -> tuple[Vector, Vector]:
+		raise NotImplementedError
+
+	def couple(self, a: Atom, b: Atom) -> tuple[Vector, Vector]:
+		if self.couples(a) and self.couples(b):
+			return self.act(a, b)
+		return Vector(0, 0, 0), Vector(0, 0, 0)
+
+class Spacetime:
+
+	"""
+	The general spacetime simulation class.
+	"""
+
+	def __init__(self, fields: )
