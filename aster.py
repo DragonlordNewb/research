@@ -29,7 +29,7 @@ class Vector:
 		self.x, self.y, self.z = x, y, z
 
 	def __repr__(self) -> str:
-		return "<" + ", ".join(self) + ">"
+		return "<" + ", ".join(map(str, self)) + ">"
 
 	def __abs__(self) -> Scalar:
 		return sqrt((x ** 2) + (y ** 2) + (z ** 2))
