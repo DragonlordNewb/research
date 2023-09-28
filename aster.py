@@ -113,7 +113,7 @@ class Calculus:
 	TRAPEZOIDAL = "trapezoidal"
 	SIMPSON = "simpson"
 
-	def __init__(self, resolution: int)
+	def __init__(self, resolution: int):
 		self._differentiationMethod: Callable = None
 		self._integrationMethod: Callable = None
 
