@@ -43,7 +43,7 @@ class Vector:
 	# Vector operations
 
 	def dot(self, other: "Vector") -> Scalar:
-		return sum([xn * yn for xn, yn in zip(self, other])
+		return sum([xn * yn for xn, yn in zip(self, other)])
 
 	def cross(self, other: "Vector") -> "Vector":
 		return Vector(
