@@ -28,6 +28,9 @@ class Vector:
 	def __init__(self, x: Scalar, y: Scalar, z: Scalar) -> None:
 		self.x, self.y, self.z = x, y, z
 
+	def __repr__(self) -> str:
+		return "<" + ", ".join(self) + ">"
+
 	def __abs__(self) -> Scalar:
 		return sqrt((x ** 2) + (y ** 2) + (z ** 2))
 
