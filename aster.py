@@ -254,6 +254,7 @@ class Atom:
 	def __init__(self, parent: "Body", location: Vector, energy: Scalar, **kwargs: dict[str, Any]) -> None:
 		self.location = location
 		self.energy = energy
+		print(kwargs)
 		for key in kwargs.keys():
 			setattr(key, self, kwargs[key])
 		self.properties = list(kwargs.keys())
