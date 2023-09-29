@@ -362,3 +362,78 @@ class Field(ABC):
 				raise RuntimeError("Bad coupling.")
 			else:
 				raise SyntaxError("Bad coupling behavior set.")
+
+class Metric(ABC):
+	PMMM = "+---"
+	MPPP = "-+++"
+	_SIGNATURES = [PMMM, MPPP]
+
+	def __init__(self, resolution: int) -> None:
+		self._signature = self.MPPP
+		self.spacetime: "Spacetime" = None
+		self.calculus = ExtendedCalculus(resolution)
+
+	def __repr__(self) -> str:
+		return "<" + type(self).__name__ + " metric, resolution " + str(self.calculus.resolution) + ">"
+	
+	@property
+	def signature(self):
+		return self._signature
+		
+	@signature.setter
+	def signature(self, value: str) -> None:
+		if value not in self.signatures:
+			raise NameError("Bad metric signature" + repr(value) + ".")
+		self._signature = value
+		
+	@signature.getter
+	def signature(self) -> str:
+		return self._signature
+		
+	@abstractmethod
+	def space(self, location: Vector) -> Scalar:
+		raise NotImplementedError
+		
+	def spaceInterval(self, a: Vector, b: Vector) -> Scalar:
+		return self.calculus.integrateLineSegment(self.space, a, b)
+		
+	@abstractmethod
+	def time(self, location: Vector) -> Scalar:
+		raise NotImplementedError
+		
+	def timeInterval(self, a: Vector, b: Vector) -> Scalar:
+		return self.calculus.integrateLineSegment(self.time, a, b)
+		
+	def spacetimeInterval(self, a: Vector, b: Vector) -> Scalar:
+		if self.signature == self.PMMM:
+			return self.timeInterval(a, b) - self.spaceInterval(a, b)
+		elif self.signature == self.MPPP:
+			return self.spaceInterval(a, b) - self.timeInterval(a, b)
+		else:
+			raise SyntaxError("Bad metric signature.")
+			
+	# Equipment methods
+	def equipTo(self, spacetime: "Spacetime") -> None:
+		if spacetime.metric != None:
+			raise RuntimeError("Spacetime already has equipped a Metric.")
+		if self.spacetime != None:
+			raise RuntimeError("Metric has already been equipped to a Spacetime.")
+		self.spacetime = spacetime
+		self.spacetime.metric = self
+		
+	def unequip(self) -> None:
+		self.spacetime.metric = None
+		self.spacetime = None
+
+class Spacetime:
+	def __init__(self) -> None:
+		self.forces = []
+		self.metric: Metric = None
+		
+	def equip(self, metric: Metric) -> None:
+		if self.metric != None:
+			raise RuntimeError("Spacetime has already equipped a Metric.")
+		if metric.spacetime != None:
+			raise RuntimeError("Metric has already been equipped to a Spacetime.")
+		self.metric = metric
+		self.metric.spacetime = self
