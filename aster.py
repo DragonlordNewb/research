@@ -356,6 +356,8 @@ class RelativisticParticle(Body):
 			**self.properties
 		)]
 
+# BUG: Sphere generator algorithm doesn't work, fix that please
+
 class Shell(Body):
 
 	# Requires a "radius" and "density" argument
@@ -402,7 +404,7 @@ class RelativisticShell(Body):
 			Atom(
 				parent = self,
 				location = location,
-				energy = self.restEnergy / self.density,
+				energy = self.restEnergy * self.gamma / self.density,
 				**self.properties
 			) for location in points
 		]
