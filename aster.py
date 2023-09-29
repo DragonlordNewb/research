@@ -370,7 +370,7 @@ class Metric(ABC):
 
 	def __init__(self, resolution: int) -> None:
 		self._signature = self.MPPP
-		self.spacetime: "Spacetime" = None
+		self._spacetime: "Spacetime" = None
 		self.calculus = ExtendedCalculus(resolution)
 
 	def __repr__(self) -> str:
@@ -413,27 +413,35 @@ class Metric(ABC):
 			raise SyntaxError("Bad metric signature.")
 			
 	# Equipment methods
-	def equipTo(self, spacetime: "Spacetime") -> None:
-		if spacetime.metric != None:
-			raise RuntimeError("Spacetime already has equipped a Metric.")
-		if self.spacetime != None:
-			raise RuntimeError("Metric has already been equipped to a Spacetime.")
-		self.spacetime = spacetime
-		self.spacetime.metric = self
-		
-	def unequip(self) -> None:
-		self.spacetime.metric = None
-		self.spacetime = None
+	@property
+	def spacetime(self):
+		return self._spacetime
+
+	@spacetime.setter
+	def spacetime(self, value: "Spacetime") -> None:
+		self._spacetime = value
+		if value != None:
+			self._spacetime._metric = self
+			
+	@spacetime.getter
+	def spacetime(self) -> "Spacetime":
+		return self._spacetime
 
 class Spacetime:
 	def __init__(self) -> None:
 		self.forces = []
-		self.metric: Metric = None
+		self._metric: Metric = None
 		
-	def equip(self, metric: Metric) -> None:
-		if self.metric != None:
-			raise RuntimeError("Spacetime has already equipped a Metric.")
-		if metric.spacetime != None:
-			raise RuntimeError("Metric has already been equipped to a Spacetime.")
-		self.metric = metric
-		self.metric.spacetime = self
+	@property
+	def metric(self) -> None:
+		return self._metric
+		
+	@metric.setter
+	def metric(self, value: Metric) -> None:
+		self._metric = value
+		if value != None:
+			self._metric._spacetime = self
+			
+	@metric.getter
+	def metric(self) -> Metric:
+		return self._metric
