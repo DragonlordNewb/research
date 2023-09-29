@@ -18,6 +18,11 @@ from typing import Iterable
 from typing import Any
 from typing import Union
 
+# Mathematical constants
+
+c = 299792458
+c2 = c ** 2
+
 # ===== Core mathematical components ===== #
 
 Scalar = Union[int, float]
@@ -35,7 +40,7 @@ class Vector:
 		return "<" + ", ".join(map(str, self)) + ">"
 
 	def __abs__(self) -> Scalar:
-		return sqrt((x ** 2) + (y ** 2) + (z ** 2))
+		return sqrt((self.x ** 2) + (self.y ** 2) + (self.z ** 2))
 
 	def __iter__(self) -> Iterable[Scalar]:
 		return iter((self.x, self.y, self.z))
@@ -100,11 +105,33 @@ class Vector:
 	def __isub__(self, other: "Vector") -> "Vector":
 		return self - other
 
-	def __imul__(self, other: "Vector") -> "Vector":
+	def __imul__(self, other: Scalar) -> "Vector":
+		return self * other
+
+	def __rmul__(self, other: Scalar) -> "Vector":
 		return self * other
 
 	def __itruediv__(self, other: "Vector") -> "Vector":
 		return self / other
+
+	# Miscellaneous
+
+	@staticmethod
+	def mean(*vectors: tuple["Vector"]) -> "Vector":
+		v = Vector(0, 0, 0)
+		for vector in vectors:
+			v += vector
+		return v
+
+	@staticmethod
+	def weightedMean(vectors: Iterable["Vector"], weights: Iterable[Scalar]) -> "Vector":
+		weightedSum = Vector(0, 0, 0)
+		totalWeight = sum(weights)
+
+		for vector, weight in zip(vectors, weights):
+			weightedSum += vector * weight
+
+		return weightedSum / totalWeight
 
 class Calculus:
 
@@ -198,15 +225,13 @@ class Calculus:
 class ExtendedCalculus(Calculus):
 	def integrateLineSegment(self, f: Callable[[Vector], Scalar], a: Vector, b: Vector, n) -> Scalar:
 		dV = b - a
-		g = lambda x: f(a + x * dV)
-		return self.integrate(g, 0, 1, n)
+		g = lambda x: f(a + (x * dV))
+		return self.integrate(g, 0, 1, n) * abs(b - a)
 
 # ===== Spacetime simulation components ===== #
 
-# === Body class === #
-
 class Atom:
-	def __init__(self, location: Vector, energy: Scalar, **kwargs: dict[str, Any]) -> None:
+	def __init__(self, parent: "Body", location: Vector, energy: Scalar, **kwargs: dict[str, Any]) -> None:
 		self.location = location
 		self.energy = energy
 		for key in kwargs.keys():
@@ -214,9 +239,67 @@ class Atom:
 		self.properties = ["location", "energy"] + list(kwargs.keys())
 
 class Body(ABC):
-	pass
 
-class Field:
+	"""
+	Generalized Python representation of an object of variable shape
+	and structure.
+
+	Supports adding properties like electric and color charge, energy,
+	etc.
+	"""
+
+	def __init__(self, id: str, energy: Scalar, **kwargs: dict[str, any]) -> None:
+		self.restEnergy = energy
+		self.location = Vector(0, 0, 0)
+		self.velocity = Vector(0, 0, 0)
+
+		for key in kwargs.keys():
+			setattr(self, key, kwargs[key])
+
+		self.properties = kwargs
+
+		self.id = id
+
+	def __hash__(self) -> int:
+		return hash(self.id)
+
+	def __repr__(self) -> str:
+		return "<" + type(self).__name__ + " " + repr(self.id) + ">"
+
+	def displace(self, displacement: Vector) -> Vector:
+		self.location += displacement
+		return self.location
+
+	def place(self, location: Vector) -> None:
+		self.location = location
+
+	def accelerate(self, deltaV: Vector) -> Vector:
+		self.velocity += deltaV
+		return self.velocity
+
+	def impulse(self, velocity: Vector) -> None:
+		self.velocity = velocity
+
+	@abstractmethod
+	def atoms(self) -> Iterable[Atom]:
+		return NotImplementedError
+
+	def centerOfMass(self) -> Vector:
+		if len(self.atoms()) == 1:
+			return self.atoms()[0].location
+
+		vecs = []
+		weights = []
+		for atom in self.atoms():
+			vecs.append(atom.location)
+			weights.append(atom.energy)
+
+		return Vector.weightedMean(vecs, weights)
+
+	def apply(self, force: Vector) -> None:
+		self.velocity += force / (self.energy / c2)
+
+class Field(ABC):
 
 	"""
 	Generalized Python representation of a force field, i.e.
@@ -224,7 +307,7 @@ class Field:
 	the color charge field which is a field of virtual gluons,
 	and the weak field which is a field of virtual W and Z bosons.
 
-	The Field.couple function is used to return the forces applied
+	The Field.couple(a, b) function is used to return the forces applied
 	to particles a and b, respectively.
 	"""
 
@@ -246,18 +329,18 @@ class Field:
 		return True
 
 	@abstractmethod
-	def act(self, a: Atom, b: Atom) -> tuple[Vector, Vector]:
+	def potential(self, st: "Spacetime", location: Vector) -> tuple[Vector, Vector]:
 		raise NotImplementedError
 
-	def couple(self, a: Atom, b: Atom) -> tuple[Vector, Vector]:
+	def couple(self, st: "Spacetime", a: Atom, b: Atom) -> tuple[Vector, Vector]:
 		if self.couples(a) and self.couples(b):
-			return self.act(a, b)
-		return Vector(0, 0, 0), Vector(0, 0, 0)
-
-class Spacetime:
-
-	"""
-	The general spacetime simulation class.
-	"""
-
-	def __init__(self, fields: )
+			return 
+		else:
+			if self.decoupledBehavior == self.IGNORE:
+				return Vector(0, 0, 0), Vector(0, 0, 0)
+			elif self.decoupledBehavior == self.WARN:
+				print("Warning: at least one particle is decoupled from the " + type(self).__name__ + " field.")
+			elif self.decoupledBehavior == self.ERROR:
+				raise RuntimeError("Bad coupling.")
+			else:
+				raise SyntaxError("Bad coupling behavior set.")
