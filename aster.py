@@ -226,7 +226,7 @@ class ExtendedCalculus(Calculus):
 	def integrateLineSegment(self, f: Callable[[Vector], Scalar], a: Vector, b: Vector, n: int=None) -> Scalar:
 		if n == None:
 			n = self.resolution
-			
+
 		dV = b - a
 		g = lambda x: f(a + (x * dV))
 		return self.integrate(g, 0, 1, n) * abs(b - a)
@@ -352,7 +352,7 @@ class Field(ABC):
 
 	def couple(self, st: "Spacetime", atom: Atom) -> tuple[Vector, Vector]:
 		if self.couples(atom):
-			return -1 * self.calculus.gradient(lambda v: self.potential(st, v), atom.location)
+			return -1 * self.calculus.gradient(lambda v: self.potential(st, v), atom.location) * atom.energy // c2
 		else:
 			if self.decoupledBehavior == self.IGNORE:
 				return Vector(0, 0, 0), Vector(0, 0, 0)
