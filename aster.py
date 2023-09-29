@@ -361,15 +361,15 @@ class Shell(Body):
 
 	def atoms(self) -> Iterable[Atom]:
 		points = []
-		phi = math.pi * (3 - math.sqrt(5))
+		phi = pi * (3 - sqrt(5))
 
 		for i in range(self.density):
 			y = 1 - (i / float(self.density - 1)) * 2
-			radius = math.sqrt(1 - (y ** 2)) * self.radius
+			radius = sqrt(1 - (y ** 2)) * self.radius
 			theta = phi * i
 
-			x = math.cos(theta) * radius
-			z = math.sin(theta) * radius
+			x = cos(theta) * radius
+			z = sin(theta) * radius
 
 			points.append(Vector(x, y, z))
 
@@ -385,15 +385,15 @@ class Shell(Body):
 class RelativisticShell(Body):
 	def atoms(self) -> Iterable[Atom]:
 		points = []
-		phi = math.pi * (3 - math.sqrt(5))
+		phi = pi * (3 - sqrt(5))
 
 		for i in range(self.density):
 			y = 1 - (i / float(self.density - 1)) * 2
-			radius = math.sqrt(1 - (y ** 2)) * self.radius
+			radius = sqrt(1 - (y ** 2)) * self.radius
 			theta = phi * i
 
-			x = math.cos(theta) * radius
-			z = math.sin(theta) * radius
+			x = cos(theta) * radius
+			z = sin(theta) * radius
 
 			points.append(Vector(x, y, z))
 
