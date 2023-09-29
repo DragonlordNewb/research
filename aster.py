@@ -342,7 +342,7 @@ class Particle(Body):
 		return [Atom(
 			parent = self,
 			location = self.location,
-			energy = self.energy,
+			energy = self.restEnergy,
 			**self.properties
 		)]
 
@@ -351,7 +351,7 @@ class RelativisticParticle(Body):
 		return [Atom(
 			parent = self,
 			location = self.location,
-			energy = self.energy * self.gamma,
+			energy = self.restEnergy * self.gamma,
 			**self.properties
 		)]
 
@@ -377,7 +377,7 @@ class Shell(Body):
 			Atom(
 				parent = self,
 				location = location,
-				energy = self.energy / self.density,
+				energy = self.restEnergy / self.density,
 				**self.properties
 			) for location in points
 		]
@@ -401,7 +401,7 @@ class RelativisticShell(Body):
 			Atom(
 				parent = self,
 				location = location,
-				energy = self.energy / self.density,
+				energy = self.restEnergy / self.density,
 				**self.properties
 			) for location in points
 		]
