@@ -256,7 +256,7 @@ class Atom:
 		self.energy = energy
 		print(kwargs)
 		for key in kwargs.keys():
-			setattr(key, self, kwargs[key])
+			setattr(self, key, kwargs[key])
 		self.properties = list(kwargs.keys())
 		self.parent = parent
 
