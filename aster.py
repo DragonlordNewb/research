@@ -254,6 +254,7 @@ class Atom:
 		for key in kwargs.keys():
 			setattr(key, self, kwargs[key])
 		self.properties = ["location", "energy"] + list(kwargs.keys())
+		self.parent = parent
 
 class Body(ABC):
 
@@ -429,9 +430,32 @@ class Metric(ABC):
 
 class Spacetime:
 	def __init__(self) -> None:
-		self.forces = []
+		self.fields = []
 		self._metric: Metric = None
+		self._bodies = {}
+
+	def __iter__(self) -> Iterable[Body]:
+		return iter(self.bodies)
+
+	def __getitem__(self, id: str) -> Body:
+		return self._bodies[id]
+
+	def __contains__(self, item) -> bool:
+		if type(item) == str:
+			return item in self._bodies.keys()
 		
+		if issubclass(type(item), Force):
+			for field in self.fields:
+				if type(field) == item or field == item:
+					return True
+			return False
+
+		return type(self.metric) == item or self.metric == item
+
+	# === Simulation properties === #
+
+	# Metric
+
 	@property
 	def metric(self) -> None:
 		return self._metric
@@ -441,7 +465,71 @@ class Spacetime:
 		self._metric = value
 		if value != None:
 			self._metric._spacetime = self
+		else:
+			if self._metric != None:
+				self._metric._spacetime = None
 			
 	@metric.getter
 	def metric(self) -> Metric:
 		return self._metric
+
+	# Bodies
+
+	@property
+	def bodies(self) -> None:
+		return self._bodies 
+
+	@bodies.setter
+	def bodies(self, value: Any) -> Exception:
+		raise SyntaxError("Can\'t directly set the Spacetime.bodies attribute.")
+
+	@bodies.getter
+	def bodies(self) -> Iterable[Body]:
+		return list(self._bodies.values())
+	
+	def addBody(self, **bodies: dict[str, Body]) -> None:
+		for bodyID, body in zip(bodies.keys(), bodies.values()):
+			body.id = bodyID
+			self._bodies[body.id] = body
+
+	def removeBody(self, *bodyIDs: tuple[str]) -> None:
+		for bodyID in bodyIDs:
+			if bodyID in self:
+				del self._bodies[bodyID]
+
+	# Atoms, really a component of Bodies
+
+	@property
+	def atoms(self) -> None:
+		return
+
+	@atoms.setter
+	def atoms(self, value: Any) -> Exception:
+		raise SyntaxError("Can\'t directly set the Spacetime.atoms attribute.")
+
+	@atoms.getter
+	def atoms(self) -> Iterable[Atom]:
+		atoms = []
+		for body in self.bodies:
+			for atom in body.atoms():
+				if atom.parent != body:
+					atom.parent = body
+				atoms.append(atom)
+
+	# Fields
+
+	def addField(self, *fields: tuple[Field]) -> None:
+		if field in self:
+			raise NameError("Spacetime already connected to a " + type(field).__name__ + " field.")
+
+		for field in fields:
+			self.fields.append(field)
+
+	def removeField(self, *fields: tuple[Field]) -> None:
+		for f in fields:
+			for index, field in enumerate(self.fields):
+				if type(field).__name__ == type(f).__name__:
+					self.fields.pop(index) # no, that won't mess anything up
+					# we're iterating over an enumerate() object, not the list
+					# itself, don't worry
+					break
