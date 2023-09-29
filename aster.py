@@ -6,6 +6,9 @@ from tkinter import Entry
 from tkinter import Button
 
 from math import sqrt
+from math import pi
+from math import sin
+from math import cos
 from math import acos
 
 from functools import cache
@@ -253,8 +256,11 @@ class Atom:
 		self.energy = energy
 		for key in kwargs.keys():
 			setattr(key, self, kwargs[key])
-		self.properties = ["location", "energy"] + list(kwargs.keys())
+		self.properties = list(kwargs.keys())
 		self.parent = parent
+
+	def __repr__(self) -> str:
+		return "<Atom @ " + repr(self.location) + ">"
 
 class Body(ABC):
 
@@ -316,6 +322,89 @@ class Body(ABC):
 
 	def apply(self, force: Vector) -> None:
 		self.velocity += force / (self.energy / c2)
+
+	@property
+	def gamma(self) -> None:
+		return
+
+	@gamma.setter
+	def gamma(self) -> Exception:
+		raise SyntaxError("Can\'t directly set the gamma of a Body.")
+
+	@gamma.getter
+	def gamma(self) -> Scalar:
+		return 1 / sqrt(1 - ((abs(self.velocity) ** 2) / c2))
+
+# Body implementations
+
+class Particle(Body):
+	def atoms(self) -> Iterable[Atom]:
+		return [Atom(
+			parent = self,
+			location = self.location,
+			energy = self.energy,
+			**self.properties
+		)]
+
+class RelativisticParticle(Body):
+	def atoms(self) -> Iterable[Atom]:
+		return [Atom(
+			parent = self,
+			location = self.location,
+			energy = self.energy * self.gamma,
+			**self.properties
+		)]
+
+class Shell(Body):
+
+	# Requires a "radius" and "density" argument
+
+	def atoms(self) -> Iterable[Atom]:
+		points = []
+		phi = math.pi * (3 - math.sqrt(5))
+
+		for i in range(self.density):
+			y = 1 - (i / float(self.density - 1)) * 2
+			radius = math.sqrt(1 - (y ** 2)) * self.radius
+			theta = phi * i
+
+			x = math.cos(theta) * radius
+			z = math.sin(theta) * radius
+
+			points.append(Vector(x, y, z))
+
+		return [
+			Atom(
+				parent = self,
+				location = location,
+				energy = self.energy / self.density,
+				**self.properties
+			) for location in points
+		]
+
+class RelativisticShell(Body):
+	def atoms(self) -> Iterable[Atom]:
+		points = []
+		phi = math.pi * (3 - math.sqrt(5))
+
+		for i in range(self.density):
+			y = 1 - (i / float(self.density - 1)) * 2
+			radius = math.sqrt(1 - (y ** 2)) * self.radius
+			theta = phi * i
+
+			x = math.cos(theta) * radius
+			z = math.sin(theta) * radius
+
+			points.append(Vector(x, y, z))
+
+		return [
+			Atom(
+				parent = self,
+				location = location,
+				energy = self.energy / self.density,
+				**self.properties
+			) for location in points
+		]
 
 class Field(ABC):
 
