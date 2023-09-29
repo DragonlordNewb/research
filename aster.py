@@ -223,10 +223,27 @@ class Calculus:
 
 
 class ExtendedCalculus(Calculus):
-	def integrateLineSegment(self, f: Callable[[Vector], Scalar], a: Vector, b: Vector, n) -> Scalar:
+	def integrateLineSegment(self, f: Callable[[Vector], Scalar], a: Vector, b: Vector, n: int=None) -> Scalar:
+		if n == None:
+			n = self.resolution
+			
 		dV = b - a
 		g = lambda x: f(a + (x * dV))
 		return self.integrate(g, 0, 1, n) * abs(b - a)
+
+	def gradient(self, f: Callable[[Vector], Scalar], location: Vector, d: Scalar=None) -> Vector:
+		if d == None:
+			d == self.resolution
+
+		fx = lambda x: f(Vector(x, location.y, location.z))
+		fy = lambda y: f(Vector(location.x, y, location.z))
+		fz = lambda z: f(Vector(location.x, location.y, z))
+
+		dfdx = self.differentiate(fx, location.x, d)
+		dfdy = self.differentiate(fy, location.y, d)
+		dfdz = self.differentiate(fz, location.z, d)
+
+		return Vector(dfdx, dfdy, dfdz)
 
 # ===== Spacetime simulation components ===== #
 
@@ -318,7 +335,8 @@ class Field(ABC):
 	couplingProperties: list[str]
 	decoupledBehavior: str = IGNORE
 
-	def __init__(self, **kwargs) -> None:
+	def __init__(self, resolution: int=1000, **kwargs) -> None:
+		self.calculus = ExtendedCalculus(resolution)
 		for key in kwargs.keys():
 			setattr(self, key, kwargs[key])
 
@@ -332,9 +350,9 @@ class Field(ABC):
 	def potential(self, st: "Spacetime", location: Vector) -> tuple[Vector, Vector]:
 		raise NotImplementedError
 
-	def couple(self, st: "Spacetime", a: Atom, b: Atom) -> tuple[Vector, Vector]:
-		if self.couples(a) and self.couples(b):
-			return 
+	def couple(self, st: "Spacetime", atom: Atom) -> tuple[Vector, Vector]:
+		if self.couples(atom):
+			return -1 * self.calculus.gradient(lambda v: self.potential(st, v), atom.location)
 		else:
 			if self.decoupledBehavior == self.IGNORE:
 				return Vector(0, 0, 0), Vector(0, 0, 0)
