@@ -224,7 +224,6 @@ class Calculus:
 			raise RuntimeError("Can\'t integrate without setting an integration method.")
 		return self._integrationMethod
 
-
 class ExtendedCalculus(Calculus):
 	def integrateLineSegment(self, f: Callable[[Vector], Scalar], a: Vector, b: Vector, n: int=None) -> Scalar:
 		if n == None:
