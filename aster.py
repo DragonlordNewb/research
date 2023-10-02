@@ -393,16 +393,22 @@ class Body(ABC):
 		return deco
 
 	@property
-	def objectClass(self) -> None:
+	def properObjectClass(self) -> None:
 		return
 	
 	@objectClass.setter
-	def objectClass(self, value: Any) -> None:
-		raise SyntaxError("Can\'t directly set objectClass.")
+	def properObjectClass(self, value: Any) -> None:
+		raise SyntaxError("Can\'t directly set properObjectClass.")
 
-	@objectClass.getter
-	def objectClass(self) -> str:
-		match self.properSpace / self.properTime
+	@properObjectClass.getter
+	def properObjectClass(self) -> str:
+		v = self.properSpace / self.properTime
+		if v < c:
+			return self.BRADYONIC
+		if v == c:
+			return self.LUXONIC
+		if v > c:
+			return self.TACHYONIC
 
 class Field(ABC):
 
