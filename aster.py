@@ -890,6 +890,7 @@ class ASTER(Tk):
 	def executeCommand(self) -> None:
 		cmd = self.cmdEntry.get()
 		self.cmdEntry.delete(0, "end")
+		self.consolePrint(" $ " + cmd)
 		
 	def project(self, v: Vector) -> tuple[Scalar, Scalar]:
 		va = self.viewportAngle
@@ -912,6 +913,7 @@ class ASTER(Tk):
 		self.console.insert("end", s + "\n")
 		
 	def runUI(self) -> None:
+		self.consolePrinte("All systems go.")
 		self.mainloop()
 
 if __name__ == "__main__":
