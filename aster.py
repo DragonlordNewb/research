@@ -892,7 +892,13 @@ class ASTER(Tk):
 	def executeCommand(self) -> None:
 		cmd = self.cmdEntry.get()
 		self.cmdEntry.delete(0, "end")
-		self.consolePrint(" $ " + cmd)
+		self.consolePrint("<User> " + cmd)
+
+		match cmd.split(" "):
+			case ("sc", *_):
+				self.consolePrint("All systems go.")
+			case _:
+				self.consolePrint("Invalid command syntax.")
 		
 	def project(self, v: Vector) -> tuple[Scalar, Scalar]:
 		va = self.viewportAngle
