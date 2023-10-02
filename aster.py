@@ -847,7 +847,7 @@ class ASTER(Tk):
 		)
 		self.console.grid(row=1, column=1, columnspan=2)
 		
-		self.cmdEntry = Entry(self.cmdShellFrame, bg="black", fg="white", font=self.FONT(12), width=40)
+		self.cmdEntry = Entry(self.cmdShellFrame, bg="black", fg="white", font=self.FONT(12), width=90)
 		self.cmdEntry.grid(row=2, column=1)
 		self.cmdEntry.bind("<Return>", lambda evt: self.executeCommand())
 		
@@ -895,6 +895,8 @@ class ASTER(Tk):
 		self.consolePrint("<User> " + cmd)
 
 		match cmd.split(" "):
+			case ("exit", *_):
+				exit(0)
 			case ("sc", *_):
 				self.consolePrint("All systems go.")
 			case _:
