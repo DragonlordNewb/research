@@ -845,7 +845,7 @@ class ASTER(Tk):
 			width=50,
 			height=10
 		)
-		self.console.grid(row=1, column=1)
+		self.console.grid(row=1, column=1, columnspan=2)
 		
 		self.cmdEntry = Entry(self.cmdShellFrame, bg="black", fg="white", font=self.FONT(12), width=40)
 		self.cmdEntry.grid(row=2, column=1)
@@ -906,6 +906,10 @@ class ASTER(Tk):
 		if va == self.ZY:
 			return (v.z, v.y)
 		raise IndexError("Bad viewport angle.")
+
+	def consolePrint(self, s: str) -> None:
+		self.console.config(disabled=True)
+		self.console.insert("end", s + "\n")
 		
 	def runUI(self) -> None:
 		self.mainloop()
