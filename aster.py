@@ -913,7 +913,7 @@ class ASTER(Tk):
 		self.console.insert("end", s + "\n")
 		
 	def runUI(self) -> None:
-		self.consolePrinte("All systems go.")
+		self.consolePrint("All systems go.")
 		self.mainloop()
 
 if __name__ == "__main__":
