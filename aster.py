@@ -898,7 +898,7 @@ class ASTER(Tk):
 		self.consolePrint("<User> " + cmd)
 		print(cmd.split(" "))
 
-		match cmd.split(" "):
+		match [x for x in cmd.split(" ") if x not in ["", " "]]:
 			case ("exit", *_):
 				exit(0)
 			case ("sc", *_):
@@ -935,7 +935,7 @@ class ASTER(Tk):
 		self.consolePrint("All systems go.")
 		self.mainloop()
 
-	def dot(self, location: Vector, width: int=3) -> None:
+	def dot(self, location: Vector, width: int=10) -> None:
 		x, y = self.project(location)
 		self.viewport.create_oval(x, y, x, y, fill="white", width=20)
 
