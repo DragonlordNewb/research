@@ -891,5 +891,21 @@ class ASTER(Tk):
 		cmd = self.cmdEntry.get()
 		self.cmdEntry.delete(0, "end")
 		
+	def project(self, v: Vector) -> tuple[Scalar, Scalar]:
+		va = self.viewportAngle
+		if va == self.XY:
+			return (v.x, v.y)
+		if va == self.XZ:
+			return (v.x, v.z)
+		if va == self.YZ:
+			return (v.y, v.z)
+		if va == self.YX:
+			return (v.y, v.x)
+		if va == self.ZX:
+			return (v.z, v.x)
+		if va == self.ZY:
+			return (v.z, v.y)
+		raise IndexError("Bad viewport angle.")
+		
 	def runUI(self) -> None:
 		self.mainloop()
