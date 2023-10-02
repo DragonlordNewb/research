@@ -808,8 +808,8 @@ class ASTER(Tk):
 		self.settingsFrame.grid(row=1, rowspan=2, column=1, columnspan=1)
 		self.viewportFrame = Frame(self, bg="black")
 		self.viewportFrame.grid(row=1, rowspan=1, column=2, columnspan=1)
-		self.cmdshellFrame = Frame(self, bg="black")
-		self.cmdshellFrame.grid(row=2, rowspan=1, column=2, columnspan=1)
+		self.cmdShellFrame = Frame(self, bg="black")
+		self.cmdShellFrame.grid(row=2, rowspan=1, column=2, columnspan=1)
 		
 		self.viewportAngle = self.XY
 		self.viewportRangeX = (-10, 10)
