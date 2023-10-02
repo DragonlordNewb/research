@@ -795,7 +795,7 @@ class ASTER(Tk):
 		ZY
 	]
 
-	FONT = lambda size: ("OCR A Extended", size)
+	FONT = lambda _, size: ("OCR A Extended", size)
 	
 	def __init__(self, resolution: int=100000) -> None:
 		self.spacetime = Spacetime(resolution)
