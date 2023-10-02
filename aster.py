@@ -849,9 +849,11 @@ class ASTER(Tk):
 		
 		self.cmdEntry = Entry(self.cmdShellFrame, bg="black", fg="white", font=self.FONT(12), width=40)
 		self.cmdEntry.grid(row=2, column=1)
+		self.cmdEntry.bind("<Return>", lambda evt: self.executeCommand())
 		
 		self.executeButton = Button(
 			self.cmdShellFrame, 
+			text="Execute",
 			bg="black", 
 			fg="white", 
 			font=self.FONT(12), 
