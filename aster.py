@@ -824,7 +824,7 @@ class ASTER(Tk):
 			bg="black",
 			fg="white",
 			font=self.FONT(12),
-			command=lambda evt: self.toggleViewportAngle()
+			command=lambda: self.toggleViewportAngle()
 		)
 		self.viewportAngleToggle.grid(row=2, column=1)
 		
@@ -910,3 +910,5 @@ class ASTER(Tk):
 	def runUI(self) -> None:
 		self.mainloop()
 
+if __name__ == "__main__":
+	ASTER().runUI()
