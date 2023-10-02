@@ -784,7 +784,7 @@ class ASTER(Tk):
 	XZ = "XZ"
 	ZX = "ZX"
 	YZ = "YZ"
-	ZY + "ZY"
+	ZY = "ZY"
 
 	ANGLES = [
 		XY,
