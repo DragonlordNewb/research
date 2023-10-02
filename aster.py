@@ -376,59 +376,6 @@ class RelativisticParticle(Body):
 			**self.properties
 		)]
 
-# BUG: Sphere generator algorithm doesn't work, fix that please
-
-class Shell(Body):
-
-	# Requires a "radius" and "density" argument
-
-	def atoms(self) -> Iterable[Atom]:
-		points = []
-		phi = pi * (3 - sqrt(5))
-
-		for i in range(self.density):
-			y = 1 - (i / float(self.density - 1)) * 2
-			radius = sqrt(1 - (y ** 2)) * self.radius
-			theta = phi * i
-
-			x = cos(theta) * radius
-			z = sin(theta) * radius
-
-			points.append(Vector(x, y, z))
-
-		return [
-			Atom(
-				parent = self,
-				location = location,
-				energy = self.restEnergy / self.density,
-				**self.properties
-			) for location in points
-		]
-
-class RelativisticShell(Body):
-	def atoms(self) -> Iterable[Atom]:
-		points = []
-		phi = pi * (3 - sqrt(5))
-
-		for i in range(self.density):
-			y = 1 - (i / float(self.density - 1)) * 2
-			radius = sqrt(1 - (y ** 2)) * self.radius
-			theta = phi * i
-
-			x = cos(theta) * radius
-			z = sin(theta) * radius
-
-			points.append(Vector(x, y, z))
-
-		return [
-			Atom(
-				parent = self,
-				location = location,
-				energy = self.restEnergy * self.gamma / self.density,
-				**self.properties
-			) for location in points
-		]
-
 class Field(ABC):
 
 	"""
