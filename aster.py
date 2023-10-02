@@ -896,6 +896,7 @@ class ASTER(Tk):
 		cmd = self.cmdEntry.get()
 		self.cmdEntry.delete(0, "end")
 		self.consolePrint("<User> " + cmd)
+		print(cmd.split(" "))
 
 		match cmd.split(" "):
 			case ("exit", *_):
