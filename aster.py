@@ -234,9 +234,9 @@ class ExtendedCalculus(Calculus):
 		g = lambda x: f(a + (x * dV))
 		return self.integrate(g, 0, 1, n) * abs(b - a)
 
-	def gradient(self, f: Callable[[Vector], Scalar], location: Vector, d: Scalar=None) -> Vector:
+	def diffgrad(self, f: Callable[[Vector], Scalar], location: Vector, d: Scalar=None) -> Vector:
 		if d == None:
-			d == self.resolution
+			d = self.resolution
 
 		fx = lambda x: f(Vector(x, location.y, location.z))
 		fy = lambda y: f(Vector(location.x, y, location.z))
@@ -246,6 +246,12 @@ class ExtendedCalculus(Calculus):
 		dfdy = self.differentiate(fy, location.y, d)
 		dfdz = self.differentiate(fz, location.z, d)
 
+		return Vector(dfdx, dfdy, dfdz)
+
+	def gradient(self, f: Callable[[Vector], Scalar], v: Vector, h: Scalar=0.001) -> Vector:
+		dfdx = (f(Vector(v.x + h, v.y, v.z)) - f(Vector(v.x - h, v.y, v.z))) / (2 * h)
+		dfdy = (f(Vector(v.x, v.y + h, v.z)) - f(Vector(v.x, v.y - h, v.z))) / (2 * h)
+		dfdz = (f(Vector(v.x, v.y, v.z + h)) - f(Vector(v.z, v.y, v.z - h))) / (2 * h)
 		return Vector(dfdx, dfdy, dfdz)
 
 # ===== Spacetime simulation components ===== #
@@ -440,12 +446,12 @@ class Field(ABC):
 		return True
 
 	@abstractmethod
-	def potential(self, st: "Spacetime", location: Vector) -> tuple[Vector, Vector]:
+	def act(self, st: "Spacetime", atom: Atom) -> tuple[Vector, Vector]:
 		raise NotImplementedError
 
 	def couple(self, st: "Spacetime", atom: Atom) -> tuple[Vector, Vector]:
 		if self.couples(atom):
-			return -1 * self.calculus.gradient(lambda v: self.potential(st, v), atom.location) * atom.energy // c2
+			return self.act(st, atom)
 		else:
 			if self.decoupledBehavior == self.IGNORE:
 				return Vector(0, 0, 0), Vector(0, 0, 0)
@@ -468,35 +474,35 @@ class Metric(ABC):
 
 	def __repr__(self) -> str:
 		return "<" + type(self).__name__ + " metric, resolution " + str(self.calculus.resolution) + ">"
-	
+
 	@property
 	def signature(self):
 		return self._signature
-		
+
 	@signature.setter
 	def signature(self, value: str) -> None:
 		if value not in self.signatures:
 			raise NameError("Bad metric signature" + repr(value) + ".")
 		self._signature = value
-		
+
 	@signature.getter
 	def signature(self) -> str:
 		return self._signature
-		
+
 	@abstractmethod
 	def space(self, location: Vector) -> Scalar:
 		raise NotImplementedError
-		
+
 	def spaceInterval(self, a: Vector, b: Vector) -> Scalar:
 		return self.calculus.integrateLineSegment(self.space, a, b)
-		
+
 	@abstractmethod
 	def time(self, location: Vector) -> Scalar:
 		raise NotImplementedError
-		
+
 	def timeInterval(self, a: Vector, b: Vector) -> Scalar:
 		return self.calculus.integrateLineSegment(self.time, a, b)
-		
+
 	def spacetimeInterval(self, a: Vector, b: Vector) -> Scalar:
 		if self.signature == self.PMMM:
 			return self.timeInterval(a, b) - self.spaceInterval(a, b)
@@ -504,7 +510,7 @@ class Metric(ABC):
 			return self.spaceInterval(a, b) - self.timeInterval(a, b)
 		else:
 			raise SyntaxError("Bad metric signature.")
-			
+
 	# Equipment methods
 	@property
 	def spacetime(self):
@@ -515,16 +521,17 @@ class Metric(ABC):
 		self._spacetime = value
 		if value != None:
 			self._spacetime._metric = self
-			
+
 	@spacetime.getter
 	def spacetime(self) -> "Spacetime":
 		return self._spacetime
 
 class Spacetime:
-	def __init__(self) -> None:
+	def __init__(self, resolution: int) -> None:
 		self.fields = []
 		self._metric: Metric = None
 		self._bodies = {}
+		self.resolution = resolution
 
 	def __iter__(self) -> Iterable[Body]:
 		return iter(self.bodies)
@@ -535,7 +542,7 @@ class Spacetime:
 	def __contains__(self, item) -> bool:
 		if type(item) == str:
 			return item in self._bodies.keys()
-		
+
 		if issubclass(type(item), Force):
 			for field in self.fields:
 				if type(field) == item or field == item:
@@ -551,7 +558,7 @@ class Spacetime:
 	@property
 	def metric(self) -> None:
 		return self._metric
-		
+
 	@metric.setter
 	def metric(self, value: Metric) -> None:
 		self._metric = value
@@ -560,7 +567,7 @@ class Spacetime:
 		else:
 			if self._metric != None:
 				self._metric._spacetime = None
-			
+
 	@metric.getter
 	def metric(self) -> Metric:
 		return self._metric
@@ -569,7 +576,7 @@ class Spacetime:
 
 	@property
 	def bodies(self) -> None:
-		return self._bodies 
+		return self._bodies
 
 	@bodies.setter
 	def bodies(self, value: Any) -> Exception:
@@ -578,7 +585,7 @@ class Spacetime:
 	@bodies.getter
 	def bodies(self) -> Iterable[Body]:
 		return list(self._bodies.values())
-	
+
 	def addBody(self, **bodies: dict[str, Body]) -> None:
 		for bodyID, body in zip(bodies.keys(), bodies.values()):
 			body.id = bodyID
@@ -625,3 +632,9 @@ class Spacetime:
 					# we're iterating over an enumerate() object, not the list
 					# itself, don't worry
 					break
+
+	# Simulation
+
+	def tickBodies(self) -> None:
+		for body in self.bodies:
+			body.location += body.velocity * self.resolution
