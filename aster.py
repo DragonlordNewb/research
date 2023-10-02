@@ -25,6 +25,10 @@ from typing import Union
 
 c = 299792458
 c2 = c ** 2
+G = 6.674e-11
+F = 9.64853321233100184e+4
+Qe = 1.602176634e-19
+NA = 6.02214076e+23
 
 # ===== Core mathematical components ===== #
 
