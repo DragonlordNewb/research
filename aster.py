@@ -842,8 +842,8 @@ class ASTER(Tk):
 			bg="black", 
 			fg="white", 
 			font=self.FONT(12),
-			width=50,
-			height=10
+			width=100,
+			height=20
 		)
 		self.console.grid(row=1, column=1, columnspan=2)
 		
