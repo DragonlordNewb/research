@@ -856,7 +856,7 @@ class ASTER(Tk):
 			fg="white", 
 			font=self.FONT(12), 
 			width=10,
-			command=lambda evt: self.executeCommand()
+			command=lambda: self.executeCommand()
 		)
 		self.executeButton.grid(row=2, column=2)
 
