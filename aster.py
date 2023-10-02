@@ -940,7 +940,7 @@ class ASTER(Tk):
 
 	def dot(self, location: Vector, width: int=35) -> None:
 		x, y = self.project(location)
-		self.viewport.create_oval(x, y, x + 1, y + 1, fill="white", width=20)
+		self.viewport.create_oval(x, y, x, y, fill="white", width=20)
 
 if __name__ == "__main__":
 	ASTER().runUI()
