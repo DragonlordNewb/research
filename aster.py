@@ -909,7 +909,9 @@ class ASTER(Tk):
 		raise IndexError("Bad viewport angle.")
 
 	def consolePrint(self, s: str) -> None:
+		self.console.config(state="enabled")
 		self.console.insert("end", s + "\n")
+		self.console.config(state="disabled")
 		
 	def runUI(self) -> None:
 		self.consolePrint("All systems go.")
