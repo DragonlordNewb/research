@@ -1,4 +1,4 @@
-import platform.system
+import platform
 import os.system
 
 match platform.system():
