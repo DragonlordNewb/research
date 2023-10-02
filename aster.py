@@ -618,20 +618,24 @@ class Spacetime:
 	# Fields
 
 	def addField(self, *fields: tuple[Field]) -> None:
-		if field in self:
-			raise NameError("Spacetime already connected to a " + type(field).__name__ + " field.")
+		for field in fields:
+			if field in self:
+				raise NameError("Spacetime already connected to a " + type(field).__name__ + " field.")
 
 		for field in fields:
 			self.fields.append(field)
 
 	def removeField(self, *fields: tuple[Field]) -> None:
-		for f in fields:
+		indices = []
+		for f in [x for x in fields]:
 			for index, field in enumerate(self.fields):
 				if type(field).__name__ == type(f).__name__:
-					self.fields.pop(index) # no, that won't mess anything up
-					# we're iterating over an enumerate() object, not the list
-					# itself, don't worry
+					indices.append(index)
 					break
+					
+		for i in indices:
+			self.fields.pop(i)
+
 
 	# Simulation
 
