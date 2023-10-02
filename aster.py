@@ -861,7 +861,7 @@ class ASTER(Tk):
 		self.executeButton.grid(row=2, column=2)
 
 	def toggleViewportAngle(self) -> None:
-		newAngle = self.ANGLES[self.ANGLES.index(self.viewportAngle) + 1]
+		newAngle = self.ANGLES[(self.ANGLES.index(self.viewportAngle) + 1) % 6]
 		self.viewportAngle = newAngle
 		self.viewportAngleToggle.config(text=newAngle)
 
