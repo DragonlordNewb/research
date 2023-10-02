@@ -773,11 +773,22 @@ class Minkowski(Metric):
 	def time(self, location: Vector) -> int:
 		return 1
 
+# ===== GUI implementation ===== #
+
 class ASTER(Tk):
 	def __init__(self, resolution: int=100000) -> None:
 		self.spacetime = Spacetime(resolution)
 		Tk.__init__(self)
 		
-	def setUpUI(self) -> None:
-		pass
+		self.title("ASTER Simulation")
+		self.config(bg="black")
+		
+		self.settingsFrame = Frame(self, bg="black")
+		self.settingsFrame.grid(row=1, rowspan=2, column=1, columnspan=1)
+		self.viewportFrame = Frame(self, bg="black")
+		self.viewportFrame.grid(row=1, rowspan=1, column=2, columnspan=1)
+		self.cmdshellFrame = Frame(self, bg="black")
+		self.cmdshellFrame.grid(row=2, rowspan=1, column=2, columnspan=1)
+		
+	def runUI(self) -> None:
 		self.mainloop()
