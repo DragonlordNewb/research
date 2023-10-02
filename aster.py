@@ -425,7 +425,7 @@ class Body(ABC):
 	def properObjectClass(self) -> None:
 		return
 	
-	@objectClass.setter
+	@properObjectClass.setter
 	def properObjectClass(self, value: Any) -> None:
 		raise SyntaxError("Can\'t directly set properObjectClass.")
 
@@ -909,3 +909,4 @@ class ASTER(Tk):
 		
 	def runUI(self) -> None:
 		self.mainloop()
+
