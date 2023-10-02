@@ -1,5 +1,5 @@
 import platform
-import os.system
+import os
 
 match platform.system():
 	case "Linux":
