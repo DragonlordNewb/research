@@ -936,7 +936,7 @@ class ASTER(Tk):
 		self.viewport.create_line(100,200,200,35, fill="green", width=5)
 		self.mainloop()
 
-	def dot(self, location: Vector, width: int=10) -> None:
+	def dot(self, location: Vector, width: int=35) -> None:
 		x, y = self.project(location)
 		self.viewport.create_oval(x, y, x + 1, y + 1, fill="white", width=20)
 
