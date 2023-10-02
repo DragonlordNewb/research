@@ -670,11 +670,9 @@ class Spacetime:
 			self.translateBody(body)
 
 	def accelerateBody(self, body: Body) -> None:
-		force = Vector(0, 0, 0)
 		for atom in body:		
 			for field in self.fields:
-				force += field.couple(atom)
-		body.velocity += force / (body.energy * body.gamma / c2)
+				body.velocity += field.couple(atom) / (atom.energy / c2)
 
 	def accelerateBodies(self) -> None:
 		for body in self.bodies:
