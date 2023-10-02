@@ -15,6 +15,7 @@ try:
 	from tkinter import Label
 	from tkinter import Canvas
 	from tkinter import Entry
+	from tkinter import Text
 	from tkinter import Button
 except ImportError:
 	try:
@@ -26,6 +27,7 @@ except ImportError:
 		from tkinter import Label
 		from tkinter import Canvas
 		from tkinter import Entry
+		from tkinter import Text
 		from tkinter import Button
 	except:
 		raise RuntimeError("Failed to import Tkinter; check that it is installed.")
@@ -776,6 +778,25 @@ class Minkowski(Metric):
 # ===== GUI implementation ===== #
 
 class ASTER(Tk):
+
+	XY = "XY"
+	YX = "YX"
+	XZ = "XZ"
+	ZX = "ZX"
+	YZ = "YZ"
+	ZY + "ZY"
+
+	ANGLES = [
+		XY,
+		XZ,
+		YZ,
+		YX,
+		ZX,
+		ZY
+	]
+
+	FONT = lambda size: ("OCR A Extended", size)
+	
 	def __init__(self, resolution: int=100000) -> None:
 		self.spacetime = Spacetime(resolution)
 		Tk.__init__(self)
@@ -789,6 +810,86 @@ class ASTER(Tk):
 		self.viewportFrame.grid(row=1, rowspan=1, column=2, columnspan=1)
 		self.cmdshellFrame = Frame(self, bg="black")
 		self.cmdshellFrame.grid(row=2, rowspan=1, column=2, columnspan=1)
+		
+		self.viewportAngle = self.XY
+		self.viewportRangeX = (-10, 10)
+		self.viewportRangeY = (-10, 10)
+		self.viewportRangeZ = (-10, 10)
+		
+		self.viewport = Canvas(self.viewportFrame, width=650, height=400, bg="black")
+		self.viewport.grid(row=1, column=1)
+		self.viewportAngleToggle = Button(
+			self.viewportFrame, 
+			text=self.viewportAngle, 
+			bg="black",
+			fg="white",
+			font=self.FONT(12),
+			command=lambda evt: self.toggleViewportAngle()
+		)
+		self.viewportAngleToggle.grid(row=2, column=1)
+		
+		self.rangeIndicator = Label(
+			self.viewportFrame,
+			text=self.getRangeIndicatorText(),
+			bg="black",
+			fg="white",
+			font=self.FONT(12)
+		)
+		self.rangeIndicator.grid(row=2, column=2)
+		
+		self.console = Text(
+			self.cmdShellFrame, 
+			bg="black", 
+			fg="white", 
+			font=self.FONT(12),
+			width=50,
+			height=10
+		)
+		self.console.grid(row=1, column=1)
+		
+		self.cmdEntry = Entry(self.cmdShellFrame, bg="black", fg="white", font=self.FONT(12), width=40)
+		self.cmdEntry.grid(row=2, column=1)
+		
+		self.executeButton = Button(
+			self.cmdShellFrame, 
+			bg="black", 
+			fg="white", 
+			font=self.FONT(12), 
+			width=10,
+			command=lambda evt: self.executeCommand()
+		)
+		self.executeButton.grid(row=2, column=2)
+
+	def toggleViewportAngle(self) -> None:
+		newAngle = self.ANGLES[self.ANGLES.index(self.viewportAngle) + 1]
+		self.viewportAngle = newAngle
+		self.viewportAngleToggle.config(text=newAngle)
+
+	def getRangeIndicatorText(self) -> str:
+		xs, xl = self.viewportRangeX
+		ys, yl = self.viewportRangeY
+		zs, zl = self.viewportRangeZ
+		xs, xl, ys, yl, zs, zl = tuple(map(str, (xs, xl, ys, yl, zs, zl)))
+		return    xs + " < X < " + xl + ", " \
+			+ ys + " < Y < " + yl + ", " \
+			+ zs + " < Z < " + zl
+
+	def updateViewportRanges(self, 
+				 x: tuple[Scalar, Scalar]=None,
+				 y: tuple[Scalar, Scalar]=None,
+				 z: tuple[Scalar, Scalar]=None) -> None:
+		if x != None:
+			self.viewportRangeX = x
+		if y != None:
+			self.viewportRangeY = y
+		if z != None:
+			self.viewportRangeZ = z
+			
+		self.rangeIndicator.config(text=self.getRangeIndicatorText())
+
+	def executeCommand(self) -> None:
+		cmd = self.cmdEntry.get()
+		self.cmdEntry.delete(0, "end")
 		
 	def runUI(self) -> None:
 		self.mainloop()
