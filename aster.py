@@ -305,6 +305,10 @@ class Body(ABC):
 	etc.
 	"""
 
+	BRADYONIC = "bradyonic"
+	LUXONIC = "luxonic"
+	TACHYONIC = "tachyonic"
+
 	REGISTRATIONS = {}
 
 	def __init__(self, id: str, energy: Scalar, **kwargs: dict[str, any]) -> None:
@@ -387,6 +391,18 @@ class Body(ABC):
 			cls.REGISTRATIONS[name] = newclass
 			return newclass
 		return deco
+
+	@property
+	def objectClass(self) -> None:
+		return
+	
+	@objectClass.setter
+	def objectClass(self, value: Any) -> None:
+		raise SyntaxError("Can\'t directly set objectClass.")
+
+	@objectClass.getter
+	def objectClass(self) -> str:
+		match self.properSpace / self.properTime
 
 class Field(ABC):
 
