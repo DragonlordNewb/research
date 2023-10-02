@@ -924,7 +924,7 @@ class ASTER(Tk):
 			r =  (v.z, v.x)
 		if va == self.ZY:
 			r =  (v.z, v.y)
-		return (r[0] - (self.VIEWPORT_WIDTH * 0 / 2), r[1] - (self.VIEWPORT_HEIGHT * 0 / 2))
+		return (r[0] - (self.VIEWPORT_WIDTH * 1 / 2), r[1] - (self.VIEWPORT_HEIGHT * 1 / 2))
 
 	def consolePrint(self, s: str) -> None:
 		self.console.config(state="normal")
@@ -933,6 +933,7 @@ class ASTER(Tk):
 		
 	def runUI(self) -> None:
 		self.consolePrint("All systems go.")
+		self.viewport.create_line(100,200,200,35, fill="green", width=5)
 		self.mainloop()
 
 	def dot(self, location: Vector, width: int=10) -> None:
