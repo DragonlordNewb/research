@@ -796,6 +796,9 @@ class ASTER(Tk):
 	]
 
 	FONT = lambda _, size: ("Lucida Console", size)
+
+	VIEWPORT_WIDTH = 650
+	VIEWPORT_HEIGHT = 400
 	
 	def __init__(self, resolution: int=100000) -> None:
 		self.spacetime = Spacetime(resolution)
@@ -816,7 +819,7 @@ class ASTER(Tk):
 		self.viewportRangeY = (-10, 10)
 		self.viewportRangeZ = (-10, 10)
 		
-		self.viewport = Canvas(self.viewportFrame, width=650, height=400, bg="black")
+		self.viewport = Canvas(self.viewportFrame, width=self.VIEWPORT_WIDTH, height=self.VIEWPORT_HEIGHT, bg="black")
 		self.viewport.grid(row=1, column=1, columnspan=2)
 		self.viewportAngleToggle = Button(
 			self.viewportFrame, 
@@ -899,24 +902,28 @@ class ASTER(Tk):
 				exit(0)
 			case ("sc", *_):
 				self.consolePrint("All systems go.")
+			case ("dot", x, y, z):
+				self.consolePrint("Drawing a dot at (" + x + ", " + y + ", " + z + ") ...")
+				self.dot(Vector(int(x), int(y), int(z)))
+				self.consolePrint("Done.")
 			case _:
 				self.consolePrint("Invalid command syntax.")
 		
 	def project(self, v: Vector) -> tuple[Scalar, Scalar]:
 		va = self.viewportAngle
 		if va == self.XY:
-			return (v.x, v.y)
+			r = (v.x, v.y)
 		if va == self.XZ:
-			return (v.x, v.z)
+			r = (v.x, v.z)
 		if va == self.YZ:
-			return (v.y, v.z)
+			r =  (v.y, v.z)
 		if va == self.YX:
-			return (v.y, v.x)
+			r =  (v.y, v.x)
 		if va == self.ZX:
-			return (v.z, v.x)
+			r =  (v.z, v.x)
 		if va == self.ZY:
-			return (v.z, v.y)
-		raise IndexError("Bad viewport angle.")
+			r =  (v.z, v.y)
+		return (r[0] + (self.VIEWPORT_WIDTH / 2), r[1] - (self.VIEWPORT_HEIGHT / 2))
 
 	def consolePrint(self, s: str) -> None:
 		self.console.config(state="normal")
@@ -926,6 +933,10 @@ class ASTER(Tk):
 	def runUI(self) -> None:
 		self.consolePrint("All systems go.")
 		self.mainloop()
+
+	def dot(self, location: Vector, width: int=3) -> None:
+		x, y = self.project(location)
+		self.viewport.create_oval(x, y, x, y, fill="white", width=20)
 
 if __name__ == "__main__":
 	ASTER().runUI()
