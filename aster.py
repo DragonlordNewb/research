@@ -924,7 +924,7 @@ class ASTER(Tk):
 			r =  (v.z, v.x)
 		if va == self.ZY:
 			r =  (v.z, v.y)
-		return (r[0] + (self.VIEWPORT_WIDTH / 2), r[1] - (self.VIEWPORT_HEIGHT / 2))
+		return (r[0] + (self.VIEWPORT_WIDTH * 0 / 2), r[1] - (self.VIEWPORT_HEIGHT * 0 / 2))
 
 	def consolePrint(self, s: str) -> None:
 		self.console.config(state="normal")
@@ -937,7 +937,7 @@ class ASTER(Tk):
 
 	def dot(self, location: Vector, width: int=10) -> None:
 		x, y = self.project(location)
-		self.viewport.create_oval(x, y, x, y, fill="white", width=20)
+		self.viewport.create_oval(x, y, x + 1, y + 1, fill="white", width=20)
 
 if __name__ == "__main__":
 	ASTER().runUI()
