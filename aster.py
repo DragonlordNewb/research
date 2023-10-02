@@ -13,6 +13,8 @@ from math import acos
 
 from functools import cache
 
+from random import randbytes
+
 from abc import ABC
 from abc import abstractmethod
 
@@ -259,7 +261,20 @@ class ExtendedCalculus(Calculus):
 
 # ===== Spacetime simulation components ===== #
 
-class Atom:
+class Massive(ABC):
+	@property
+	def mass(self) -> None:
+		return
+
+	@mass.setter
+	def mass(self, value) -> Exception:
+		raise SyntaxError("Can\'t directly set mass of an object, use energy / c2.")
+
+	@mass.getter
+	def mass(self) -> Scalar:
+		return self.energy / 2
+
+class Atom(Massive):
 	def __init__(self, parent: "Body", location: Vector, energy: Scalar, **kwargs: dict[str, Any]) -> None:
 		self.location = location
 		self.energy = energy
@@ -269,8 +284,16 @@ class Atom:
 		self.properties = list(kwargs.keys())
 		self.parent = parent
 
+		self.id = randbytes(32)
+
 	def __repr__(self) -> str:
 		return "<Atom @ " + repr(self.location) + ">"
+
+	def __hash__(self) -> int:
+		return hash(self.id)
+
+	def __eq__(self, other) -> bool:
+		return hash(self) == hash(other)
 
 class Body(ABC):
 
@@ -281,6 +304,8 @@ class Body(ABC):
 	Supports adding properties like electric and color charge, energy,
 	etc.
 	"""
+
+	REGISTRATIONS = {}
 
 	def __init__(self, id: str, energy: Scalar, **kwargs: dict[str, any]) -> None:
 		self.restEnergy = energy
@@ -356,25 +381,12 @@ class Body(ABC):
 	def gamma(self) -> Scalar:
 		return 1 / sqrt(1 - ((abs(self.velocity) ** 2) / c2))
 
-# Body implementations
-
-class Particle(Body):
-	def atoms(self) -> Iterable[Atom]:
-		return [Atom(
-			parent = self,
-			location = self.location,
-			energy = self.restEnergy,
-			**self.properties
-		)]
-
-class RelativisticParticle(Body):
-	def atoms(self) -> Iterable[Atom]:
-		return [Atom(
-			parent = self,
-			location = self.location,
-			energy = self.restEnergy * self.gamma,
-			**self.properties
-		)]
+	@classmethod
+	def register(cls, name: str) -> type:
+		def deco(newclass: type) -> type:
+			cls.REGISTRATIONS[name] = newclass
+			return newclass
+		return deco
 
 class Field(ABC):
 
@@ -394,6 +406,8 @@ class Field(ABC):
 
 	couplingProperties: list[str]
 	decoupledBehavior: str = IGNORE
+
+	REGISTRATIONS = {}
 
 	def __init__(self, resolution: int=1000, **kwargs) -> None:
 		self.calculus = ExtendedCalculus(resolution)
@@ -423,10 +437,19 @@ class Field(ABC):
 			else:
 				raise SyntaxError("Bad coupling behavior set.")
 
+	@classmethod
+	def register(cls, name: str) -> type:
+		def deco(newclass: type) -> type:
+			cls.REGISTRATIONS[name] = newclass
+			return newclass
+		return deco
+
 class Metric(ABC):
 	PMMM = "+---"
 	MPPP = "-+++"
 	_SIGNATURES = [PMMM, MPPP]
+
+	REGISTRATIONS = {}
 
 	def __init__(self, resolution: int) -> None:
 		self._signature = self.MPPP
@@ -486,6 +509,13 @@ class Metric(ABC):
 	@spacetime.getter
 	def spacetime(self) -> "Spacetime":
 		return self._spacetime
+
+	@classmethod
+	def register(cls, name: str) -> type:
+		def deco(newclass: type) -> type:
+			cls.REGISTRATIONS[name] = newclass
+			return newclass
+		return deco
 
 class Spacetime:
 	def __init__(self, resolution: int) -> None:
@@ -624,7 +654,7 @@ class Spacetime:
 		for atom in body:		
 			for field in self.fields:
 				force += field.couple(atom)
-		body.velocity += force / (sum([atom.energy for atom in body]) / c2)
+		body.velocity += force / sum([atom.mass for atom in body])
 
 	def accelerateBodies(self) -> None:
 		for body in self.bodies:
@@ -641,3 +671,55 @@ class Spacetime:
 
 		self.translateBodies()
 		self.accelerateBodies()
+
+# ===== Realistic implementations ===== #
+
+@Field.register("Gravitation")
+class Gravitation(Field):
+	couplingProperties = ["mass"]
+
+	def act(self, st: Spacetime, atom: Atom) -> Vector:
+		f = Vector(0, 0, 0)
+
+		for otherAtom in st.atoms:
+			# atoms don't act on themselves gravitationally
+			if otherAtom == atom:
+				continue
+
+			massprod = atom.mass * otherAtom.mass * G
+			dl = otherAtom.location - atom.location
+			r = abs(dl)
+			r2 = r ** 2
+			direction = dl.normal()
+
+			f += direction * massprod / r2
+
+		return f
+
+@Body.register("Particle")
+class Particle(Body):
+	def atoms(self) -> Iterable[Atom]:
+		return [Atom(
+			parent = self,
+			location = self.location,
+			energy = self.restEnergy,
+			**self.properties
+		)]
+
+@Body.register("RelativisticParticle")
+class RelativisticParticle(Body):
+	def atoms(self) -> Iterable[Atom]:
+		return [Atom(
+			parent = self,
+			location = self.location,
+			energy = self.restEnergy * self.gamma,
+			**self.properties
+		)]
+
+@Metric.register("Minkowski")
+class Minkowski(Metric):
+	def space(self, location: Vector) -> int:
+		return 1
+
+	def time(self, location: Vector) -> int:
+		return 1
