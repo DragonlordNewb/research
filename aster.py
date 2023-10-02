@@ -291,11 +291,22 @@ class Body(ABC):
 
 		self.id = id
 
+		self.experiencedTime = 0
+		self.experiencedSpace = 0
+		self.properTime = 0
+		self.properSpace = 0
+
 	def __hash__(self) -> int:
 		return hash(self.id)
 
+	def __eq__(self) -> bool:
+		return hash(self) == hash(other)
+
 	def __repr__(self) -> str:
 		return "<" + type(self).__name__ + " " + repr(self.id) + ">"
+
+	def __iter__(self) -> Iterable[Atom]:
+		return iter(self.atoms())
 
 	def displace(self, displacement: Vector) -> Vector:
 		self.location += displacement
@@ -639,6 +650,44 @@ class Spacetime:
 
 	# Simulation
 
-	def tickBodies(self) -> None:
+	def translateBody(self, body: Body) -> None:
+		space = self.metric.space(body.location)
+		time = self.metric.time(body.location)
+		warp = space / time
+
+		il = body.location
+		body.location += body.velocity * self.resolution * warp
+		fl = body.location
+		dl = fl - dl
+
+		body.properTime += self.resolution
+		body.properSpace += abs(dl)
+		body.experiencedTime += self.resolution * time
+		body.experiencedSpace += abs(dl) * space
+
+	def translateBodies(self) -> None:
 		for body in self.bodies:
-			body.location += body.velocity * self.resolution
+			self.translateBody(body)
+
+	def accelerateBody(self, body: Body) -> None:
+		force = Vector(0, 0, 0)
+		for atom in body:		
+			for field in self.fields:
+				force += field.couple(atom)
+		body.velocity += force / (body.energy * body.gamma / c2)
+
+	def accelerateBodies(self) -> None:
+		for body in self.bodies:
+			self.accelerateBody(body)
+
+	def tick(self, iterations: int=1) -> None:
+		# realistically this could be a recursive function
+		# but then the iteration count would be limited by
+		# Python's recursion limit.
+
+		if iterations != 1:
+			for _ in range(iterations - 1):
+				self.tick(iterations=1)
+
+		self.translateBodies()
+		self.accelerateBodies()
