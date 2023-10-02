@@ -1,9 +1,36 @@
-from tkinter import Tk
-from tkinter import Frame
-from tkinter import Label
-from tkinter import Canvas
-from tkinter import Entry
-from tkinter import Button
+import platform.system
+import os.system
+
+match platform.system():
+	case "Linux":
+		PY = "python3"
+	case "Windows":
+		PY = "py"
+	case _:
+		raise OSError("ASTER is currently only capable of running on Windows and Linux.")
+
+try:
+	from tkinter import Tk
+	from tkinter import Frame
+	from tkinter import Label
+	from tkinter import Canvas
+	from tkinter import Entry
+	from tkinter import Button
+except ImportError:
+	try:
+		print("Tkinter not found, attempting to install ...")
+		os.system(PY + " -m pip install tk --no-warn-script-location") # install tk
+		print("Install attempt complete.")
+		from tkinter import Tk
+		from tkinter import Frame
+		from tkinter import Label
+		from tkinter import Canvas
+		from tkinter import Entry
+		from tkinter import Button
+	except:
+		raise RuntimeError("Failed to import Tkinter; check that it is installed.")
+except Exception as e:
+	raise e
 
 from math import sqrt
 from math import pi
@@ -745,3 +772,12 @@ class Minkowski(Metric):
 
 	def time(self, location: Vector) -> int:
 		return 1
+
+class ASTER(Tk):
+	def __init__(self, resolution: int=100000) -> None:
+		self.spacetime = Spacetime(resolution)
+		Tk.__init__(self)
+		
+	def setUpUI(self) -> None:
+		pass
+		self.mainloop()
