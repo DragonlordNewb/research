@@ -817,7 +817,7 @@ class ASTER(Tk):
 		self.viewportRangeZ = (-10, 10)
 		
 		self.viewport = Canvas(self.viewportFrame, width=650, height=400, bg="black")
-		self.viewport.grid(row=1, column=1)
+		self.viewport.grid(row=1, column=1, columnspan=2)
 		self.viewportAngleToggle = Button(
 			self.viewportFrame, 
 			text=self.viewportAngle, 
