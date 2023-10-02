@@ -905,7 +905,9 @@ class ASTER(Tk):
 				self.consolePrint("All systems go.")
 			case ("dot", x, y, z):
 				self.consolePrint("Drawing a dot at (" + x + ", " + y + ", " + z + ") ...")
-				self.dot(Vector(int(x), int(y), int(z)))
+				v = Vector(int(x), int(y), int(z))
+				self.consolePrint("Projection: " + repr(self.project(v)))
+				self.dot(v)
 				self.consolePrint("Done.")
 			case _:
 				self.consolePrint("Invalid command syntax.")
