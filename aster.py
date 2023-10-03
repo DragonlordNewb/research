@@ -424,7 +424,7 @@ class Body(ABC):
 	@property
 	def properObjectClass(self) -> None:
 		return
-	
+
 	@properObjectClass.setter
 	def properObjectClass(self, value: Any) -> None:
 		raise SyntaxError("Can\'t directly set properObjectClass.")
@@ -674,7 +674,7 @@ class Spacetime:
 				if type(field).__name__ == type(f).__name__:
 					indices.append(index)
 					break
-					
+
 		for i in indices:
 			self.fields.pop(i)
 
@@ -702,7 +702,7 @@ class Spacetime:
 
 	def accelerateBody(self, body: Body) -> None:
 		force = Vector(0, 0, 0)
-		for atom in body:		
+		for atom in body:
 			for field in self.fields:
 				force += field.couple(atom)
 		body.velocity += force / sum([atom.mass for atom in body])
@@ -799,38 +799,38 @@ class ASTER(Tk):
 
 	VIEWPORT_WIDTH = 650
 	VIEWPORT_HEIGHT = 400
-	
+
 	def __init__(self, resolution: int=100000) -> None:
 		self.spacetime = Spacetime(resolution)
 		Tk.__init__(self)
-		
+
 		self.title("ASTER Simulation")
 		self.config(bg="black")
-		
+
 		self.settingsFrame = Frame(self, bg="black")
 		self.settingsFrame.grid(row=1, rowspan=2, column=1, columnspan=1)
 		self.viewportFrame = Frame(self, bg="black")
 		self.viewportFrame.grid(row=1, rowspan=1, column=2, columnspan=1)
 		self.cmdShellFrame = Frame(self, bg="black")
 		self.cmdShellFrame.grid(row=2, rowspan=1, column=2, columnspan=1)
-		
+
 		self.viewportAngle = self.XY
 		self.viewportRangeX = (-10, 10)
 		self.viewportRangeY = (-10, 10)
 		self.viewportRangeZ = (-10, 10)
-		
+
 		self.viewport = Canvas(self.viewportFrame, width=self.VIEWPORT_WIDTH, height=self.VIEWPORT_HEIGHT, bg="black")
 		self.viewport.grid(row=1, column=1, columnspan=2)
 		self.viewportAngleToggle = Button(
-			self.viewportFrame, 
-			text=self.viewportAngle, 
+			self.viewportFrame,
+			text=self.viewportAngle,
 			bg="black",
 			fg="white",
 			font=self.FONT(12),
 			command=lambda: self.toggleViewportAngle()
 		)
 		self.viewportAngleToggle.grid(row=2, column=1)
-		
+
 		self.rangeIndicator = Label(
 			self.viewportFrame,
 			text=self.getRangeIndicatorText(),
@@ -839,27 +839,27 @@ class ASTER(Tk):
 			font=self.FONT(12)
 		)
 		self.rangeIndicator.grid(row=2, column=2)
-		
+
 		self.console = Text(
-			self.cmdShellFrame, 
-			bg="black", 
-			fg="white", 
+			self.cmdShellFrame,
+			bg="black",
+			fg="white",
 			font=self.FONT(12),
 			width=100,
 			height=20
 		)
 		self.console.grid(row=1, column=1, columnspan=2)
-		
+
 		self.cmdEntry = Entry(self.cmdShellFrame, bg="black", fg="white", font=self.FONT(12), width=90)
 		self.cmdEntry.grid(row=2, column=1)
 		self.cmdEntry.bind("<Return>", lambda evt: self.executeCommand())
-		
+
 		self.executeButton = Button(
-			self.cmdShellFrame, 
+			self.cmdShellFrame,
 			text="Execute",
-			bg="black", 
-			fg="white", 
-			font=self.FONT(12), 
+			bg="black",
+			fg="white",
+			font=self.FONT(12),
 			width=10,
 			command=lambda: self.executeCommand()
 		)
@@ -869,6 +869,8 @@ class ASTER(Tk):
 		newAngle = self.ANGLES[(self.ANGLES.index(self.viewportAngle) + 1) % 6]
 		self.viewportAngle = newAngle
 		self.viewportAngleToggle.config(text=newAngle)
+		self.clearViewport()
+		self.consolePrint("Toggled viewing angle.")
 
 	def getRangeIndicatorText(self) -> str:
 		xs, xl = self.viewportRangeX
@@ -879,7 +881,10 @@ class ASTER(Tk):
 			+ ys + " < Y < " + yl + ", " \
 			+ zs + " < Z < " + zl
 
-	def updateViewportRanges(self, 
+	def clearViewport(self) -> None:
+		self.viewport.delete("all")
+
+	def updateViewportRanges(self,
 				 x: tuple[Scalar, Scalar]=None,
 				 y: tuple[Scalar, Scalar]=None,
 				 z: tuple[Scalar, Scalar]=None) -> None:
@@ -889,7 +894,7 @@ class ASTER(Tk):
 			self.viewportRangeY = y
 		if z != None:
 			self.viewportRangeZ = z
-			
+
 		self.rangeIndicator.config(text=self.getRangeIndicatorText())
 
 	def executeCommand(self) -> None:
@@ -911,7 +916,7 @@ class ASTER(Tk):
 				self.consolePrint("Done.")
 			case _:
 				self.consolePrint("Invalid command syntax.")
-		
+
 	def project(self, v: Vector) -> tuple[Scalar, Scalar]:
 		va = self.viewportAngle
 		if va == self.XY:
@@ -926,21 +931,27 @@ class ASTER(Tk):
 			r =  (v.z, v.x)
 		if va == self.ZY:
 			r =  (v.z, v.y)
-		return (r[0] - (self.VIEWPORT_WIDTH * 1 / 2), r[1] - (self.VIEWPORT_HEIGHT * 1 / 2))
+		return (r[0] + (self.VIEWPORT_WIDTH * 1 / 2), r[1] + (self.VIEWPORT_HEIGHT * 1 / 2))
 
 	def consolePrint(self, s: str) -> None:
 		self.console.config(state="normal")
 		self.console.insert("end", s + "\n")
 		self.console.config(state="disabled")
-		
+
 	def runUI(self) -> None:
 		self.consolePrint("All systems go.")
-		self.viewport.create_line(100,200,200,35, fill="green", width=5)
 		self.mainloop()
 
 	def dot(self, location: Vector, width: int=35) -> None:
 		x, y = self.project(location)
-		self.viewport.create_oval(x, y, x, y, fill="white", width=20)
+		print("printing " + repr(location) + " to " + repr((x, y)))
+		self.viewport.create_rectangle(x - 5, y - 5, x + 5, y + 5, fill="green")
+
+	def grid(self, width: int=1) -> None:
+		for x in range(0, self.VIEWPORT_WIDTH, 25):
+			self.viewport.create_line(x, 0, x, self.VIEWPORT_HEIGHT, fill="white", width=width)
+		for y in range(0, self.VIEWPORT_HEIGHT, 25):
+			self.viewport.create_line(0, y, self.VIEWPORT_WIDTH, y, fill="white", width=width)
 
 if __name__ == "__main__":
 	ASTER().runUI()
