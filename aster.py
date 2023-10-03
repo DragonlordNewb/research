@@ -438,6 +438,24 @@ class Body(ABC):
 			return self.LUXONIC
 		if v > c:
 			return self.TACHYONIC
+			
+	@property
+	def apparentObjectClass(self) -> None:
+		return
+		
+	@apparentObjectClass.setter
+	def apparentObjectClass(self, value: Any) -> Exception:
+		raise SyntaxError("Can\'t directly set apparentObjectClass.")
+		
+	@apparentObjectClass.getter
+	def apparentObjectClass(self) -> str:
+		v = self.experiencedSpace / self.experiencedTime
+		if v < c:
+			return self.BRADYONIC
+		if v == c:
+			return self.LUXONIC
+		if v > c:
+			return self.TACHYONIC
 
 class Field(ABC):
 
