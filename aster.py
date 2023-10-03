@@ -173,6 +173,11 @@ class Vector:
 
 class Calculus:
 
+	"""
+ 	Basic calculus engine, used internally to perform
+  	differentiation and integration when necessary.
+ 	"""
+
 	# Differentiation methods
 
 	CENTRAL = "central"
@@ -260,6 +265,11 @@ class Calculus:
 		return self._integrationMethod
 
 class ExtendedCalculus(Calculus):
+
+	"""
+ 	Add the ability to integrate over line segments, etc.
+ 	"""
+	
 	def integrateLineSegment(self, f: Callable[[Vector], Scalar], a: Vector, b: Vector, n: int=None) -> Scalar:
 		if n == None:
 			n = self.resolution
@@ -291,6 +301,13 @@ class ExtendedCalculus(Calculus):
 # ===== Spacetime simulation components ===== #
 
 class Massive(ABC):
+
+	"""
+ 	Applying this superclass to a class with a ".energy"
+  	attribute will at a ".mass" attribute which intuitively
+   	always equals energy divided by the speed of light squared.
+ 	"""
+	
 	@property
 	def mass(self) -> None:
 		return
@@ -304,6 +321,14 @@ class Massive(ABC):
 		return self.energy / 2
 
 class Atom(Massive):
+
+	"""
+ 	A representation of an "atom", a point mass that has
+  	arbitrary other properties. Atoms exist only ephemerally
+   	during the physics calculations of the simulation, and
+    	as such the Atom doesn't have velocity, only location.
+ 	"""
+	
 	def __init__(self, parent: "Body", location: Vector, energy: Scalar, **kwargs: dict[str, Any]) -> None:
 		self.location = location
 		self.energy = energy
@@ -331,7 +356,8 @@ class Body(ABC):
 	and structure.
 
 	Supports adding properties like electric and color charge, energy,
-	etc.
+	etc., and supports the idea of an object being made up of multiple
+ 	"atoms" that together act as a single object.
 	"""
 
 	BRADYONIC = "bradyonic"
@@ -370,17 +396,30 @@ class Body(ABC):
 		return iter(self.atoms())
 
 	def displace(self, displacement: Vector) -> Vector:
+		"""
+  		Displace the object using the displacement vector given.
+  		"""
 		self.location += displacement
 		return self.location
 
 	def place(self, location: Vector) -> None:
+		"""
+  		Instantaneously set the object at a particular location,
+    		without accelerating it.
+  		"""
 		self.location = location
 
 	def accelerate(self, deltaV: Vector) -> Vector:
+		"""
+  		Accelerate the object instantaneously using a delta-V vector.
+  		"""
 		self.velocity += deltaV
 		return self.velocity
 
 	def impulse(self, velocity: Vector) -> None:
+		"""
+  		Set the velocity of the object to the given vector.
+  		"""
 		self.velocity = velocity
 
 	@abstractmethod
@@ -388,6 +427,9 @@ class Body(ABC):
 		return NotImplementedError
 
 	def centerOfMass(self) -> Vector:
+		"""
+  		Calculate the location of the center of mass of the object.
+  		"""
 		if len(self.atoms()) == 1:
 			return self.atoms()[0].location
 
@@ -400,6 +442,9 @@ class Body(ABC):
 		return Vector.weightedMean(vecs, weights)
 
 	def apply(self, force: Vector) -> None:
+		"""
+  		Apply a given force vector to the object.
+  		"""
 		self.velocity += force / (self.energy / c2)
 
 	@property
@@ -412,10 +457,18 @@ class Body(ABC):
 
 	@gamma.getter
 	def gamma(self) -> Scalar:
+		"""
+  		Return the canonically-derived relativistic gamma factor of the object.
+  		"""
 		return 1 / sqrt(1 - ((abs(self.velocity) ** 2) / c2))
 
 	@classmethod
 	def register(cls, name: str) -> type:
+		"""
+  		Register the class under the given name.
+    		Can be accessed from the Body.REGISTRATIONS dictionary
+      		later.
+  		"""
 		def deco(newclass: type) -> type:
 			cls.REGISTRATIONS[name] = newclass
 			return newclass
@@ -431,6 +484,12 @@ class Body(ABC):
 
 	@properObjectClass.getter
 	def properObjectClass(self) -> str:
+		"""
+  		Return how the object would be moving through a corresponding
+    		flat Minkowski space. "bradyonic" if the movement appears slower
+      		than light, "luxonic" if it appears exactly the speed of light,
+		and "tachyonic" if it appears faster than the speed of light.
+  		"""
 		v = self.properSpace / self.properTime
 		if v < c:
 			return self.BRADYONIC
@@ -449,6 +508,11 @@ class Body(ABC):
 		
 	@apparentObjectClass.getter
 	def apparentObjectClass(self) -> str:
+		"""
+  		Returns how the object appears to be moving, given that
+    		it's moving in a curved spacetime through gravitational
+      		fields, warp fields, etc.
+  		"""
 		v = self.experiencedSpace / self.experiencedTime
 		if v < c:
 			return self.BRADYONIC
@@ -456,6 +520,12 @@ class Body(ABC):
 			return self.LUXONIC
 		if v > c:
 			return self.TACHYONIC
+
+	def mark(self) -> None:
+		"""
+  		Reset the Body's measurement of space and time.
+  		"""
+		self.experiencedSpace = self.properSpace = self.experiencedTime = self.properTime = 0
 
 class Field(ABC):
 
@@ -632,6 +702,9 @@ class Spacetime:
 	def metric(self) -> Metric:
 		return self._metric
 
+	def distance(self, v1: Vector, v2: Vector) -> Scalar:
+		return metric.spaceInterval(v1, v2)
+
 	# Bodies
 
 	@property
@@ -757,7 +830,7 @@ class Gravitation(Field):
 
 			massprod = atom.mass * otherAtom.mass * G
 			dl = otherAtom.location - atom.location
-			r = abs(dl)
+			r = self.spaceInterval(atom.location, otherAtom.location)
 			r2 = r ** 2
 			direction = dl.normal()
 
