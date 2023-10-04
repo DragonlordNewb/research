@@ -4,6 +4,10 @@ using namespace std;
 
 const int MEASUREMENT_COUNT = 1000;
 
+// For if everything needs to stop.
+
+bool ABORTED = false;
+
 // Pin numbers for the devices in question.
 
 const char PWR_CONTROL_PHOTOSENSOR = 2;
@@ -89,6 +93,60 @@ void writeUDL(unsigned long long x) {
 	Serial.print((char)((x >> 56) & 0xFF));
 }
 
-void setup() {}
+void setup() {
+	// Set up the serial port to write data.
+	Serial.begin(9600); // assume baud of 9,600
+	Serial.write("Initializing interferometer ...\n");
+	Serial.write("  Configuring IO pins ...\n");
+	Serial.write("    Setting up control photosensor power output ...");
+	pinMode(PWR_CONTROL_PHOTOSENSOR, OUTPUT);
+	Serial.write("done.\n");
+	Serial.write("    Setting up test photosensor power output ...");
+	pinMode(PWR_TEST_PHOTOSENSOR, OUTPUT);
+	Serial.write("done.\n");
+	Serial.write("    Setting up test device power output ...");
+	pinMode(PWR_TEST_DEVICE, OUTPUT);
+	Serial.write("done.\n");
+	Serial.write("    Setting up laser power output ...");
+	pinMode(PWR_LASER, OUTPUT);
+	Serial.write("done.\n");
+	Serial.write("    Setting up control photosensor data input ...");
+	pinMode(DATA_CONTROL_PHOTOSENSOR, INPUT);
+	Serial.write("done\n.");
+	Serial.write("    Setting up test photosensor data input ...");
+	pinMode(DATA_TEST_PHOTOSENSOR, INPUT);
+	Serial.write("done.\n");
+	Serial.write("  IO pins configured.\n");
+	Serial.write("  Running basic calibration tests ...");
+	Serial.write("    Checking ambient light levels on control photosensor ...");
+	if (digitalRead(DATA_CONTROL_PHOTOSENSOR) == 0) {
+		Serial.write("SYSTEM FAILURE.\n    Ambient light level too high, cannot activate interferometer.");
+		ABORTED = true;
+		return 1;
+	}
+	Serial.write("system nominal.\n");
+	Serial.write("    Checking ambient light levels on test photosensor ...");
+	if (digitalRead(DATA_TEST_PHOTOSENSOR) == 0) {
+		Serial.write("SYSTEM FAILURE.\n    Ambient light level too high, cannot activate interferometer.");
+		ABORTED = true;
+		return 2;
+	}
+	Serial.write("system nominal.\n");
+	Serial.write("    Checking laser alignment (warning: laser will power on momentarily) ...");
+	delay(3000);
+	digitalWrite(PWR_LASER, HIGH);
+	delay(100);
+	if (digitalRead(DATA_CONTROL_PHOTOSENSOR) + digitalRead(DATA_TEST_PHOTOSENSOR) > 0) {
+		Serial.write("SYSTEM FAILURE.\n    Laser not properly aligned to target, ensure laser is aligned and restart.");
+		ABORTED = true;
+		return 3;
+	}
+	digitalWrite(PWR_LASER, LOW);
+	Serial.write("system nominal.\n");
+	Serial.write("  All systems go.");
+	Serial.write("Ready to activate interferometer. Measurements will begin momentarily.\n");
+	Serial.write("Warning: laser hazard. Do not look directly into the laser beam.\n\n");
+	delay(5000);
+}
 
 void loop() {}
