@@ -21,11 +21,6 @@ const char DATA_TEST_PHOTOSENSOR = 7;
 // which was selected so that overflow is not
 // a problem.
 
-// Since these variables take up a very large data volume,
-// they are stored in flash memory rather than in RAM
-// which for the purposes of the interferometer experiment
-// needs to be running as fast as possible.
-
 unsigned long long data[MEASUREMENT_COUNT] = {};
 unsigned long long stopwatch = 0;
 
@@ -42,7 +37,7 @@ unsigned long long computeResult() {
 
 // Data acquisition functions.
 
-unsigned long long int acquireDataPoint(const char sensorPin) {
+unsigned long long acquireDataPoint(const char sensorPin) {
 
     // Power on the desired sensor and wait for a moment.
     digitalWrite(sensorPin, HIGH);
@@ -68,6 +63,30 @@ unsigned long long int acquireDataPoint(const char sensorPin) {
 
     return computeResult();
 
+}
+
+void writeUDL(unsigned long long x) {
+	// By default, Arduino microcontrollers can't actually write
+	// "unsigned long long" data types to Serial. This function
+	// breaks it up into eight chars and prints it one byte at a
+	// time.
+	//
+	// Right shifts and one-byte masking are used to achieve this.
+	//
+	//	(char)((x >> (8 * n)) & 0xFF)
+	//
+	// returns the nth byte of x as a char by shifting the value
+	// 8 * n bits to the right and then running a bitmask of just
+	// the last 8 bits.
+
+	Serial.print((char)((x >> 0 ) & 0xFF));
+	Serial.print((char)((x >> 8 ) & 0xFF));
+	Serial.print((char)((x >> 16) & 0xFF));
+	Serial.print((char)((x >> 24) & 0xFF));
+	Serial.print((char)((x >> 32) & 0xFF));
+	Serial.print((char)((x >> 40) & 0xFF));
+	Serial.print((char)((x >> 48) & 0xFF));
+	Serial.print((char)((x >> 56) & 0xFF));
 }
 
 void setup() {}
