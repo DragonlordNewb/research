@@ -10,25 +10,25 @@ match platform.system():
 		raise OSError("ASTER is currently only capable of running on Windows and Linux.")
 
 try:
-	from tk import Tk
-	from tk import Frame
-	from tk import Label
-	from tk import Canvas
-	from tk import Entry
-	from tk import Text
-	from tk import Button
+	from tkinter import Tk
+	from tkinter import Frame
+	from tkinter import Label
+	from tkinter import Canvas
+	from tkinter import Entry
+	from tkinter import Text
+	from tkinter import Button
 except ImportError:
 	try:
 		print("Tkinter not found, attempting to install ...")
 		os.system(PY + " -m pip install tk --no-warn-script-location") # install tk
 		print("Install attempt complete.")
-		from tk import Tk
-		from tk import Frame
-		from tk import Label
-		from tk import Canvas
-		from tk import Entry
-		from tk import Text
-		from tk import Button
+		from tkinter import Tk
+		from tkinter import Frame
+		from tkinter import Label
+		from tkinter import Canvas
+		from tkinter import Entry
+		from tkinter import Text
+		from tkinter import Button
 	except:
 		raise RuntimeError("Failed to import Tkinter; check that it is installed.")
 except Exception as e:
