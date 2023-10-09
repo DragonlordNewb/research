@@ -65,7 +65,7 @@ class ClassificationTracker:
 		self.experiencedTime = self.experiencedSpace = self.properTime = self.properSpace = 0
 
 class Body(ABC):
-	def __init__(self, id: str, location: vector, **charges: dict[str, Any]) -> None:
+	def __init__(self, id: str, location: Vector, **charges: dict[str, Any]) -> None:
 		self.id = id
 
 		self.location = location
