@@ -19,14 +19,50 @@ class ClassificationTracker:
 	LUXONIC = "luxonic"
 	TACHYONIC = "tachyonic"
 
+	CANNOT_SET_EXPERIENCED_CLASS = SystemFailure(SystemFailure.FATAL, "Cannot directly set experienced class.", "Cannot directly set the experienced class on a ClassificationTracker object.")
+	CANNOT_SET_PROPER_CLASS = SystemFailure(SystemFailure.FATAL, "Cannot directly set proper class.", "Cannot directly set the proper class on a ClassificationTracker object.")
+
 	def __init__(self):
 		self.experiencedTime = 0
 		self.experiencedSpace = 0
 		self.properTime = 0
 		self.properSpace = 0
 
-	def experiential(self) -> str:
-		return self.BRADYONIC if self.experiencedSpace / self.experiencedTime < c
+	@staticmethod
+	def classify(v: Scalar) -> None:
+		if v < c:
+			return self.BRADYONIC
+		if v == c:
+			return self.LUXONIC
+		if v > c:
+			return self.TACHYONIC
+
+	@property
+	def experienced(self) -> None:
+		return
+	
+	@experienced.setter
+	def experienced(self, value: Any) -> Exception:
+		self.CANNOT_SET_EXPERIENCED_CLASS.panic()
+
+	@experienced.getter
+	def experienced(self) -> str:
+		return self.classify(self.experiencedSpace / self.experiencedTime)
+
+	@property
+	def proper(self) -> None:
+		return
+	
+	@proper.setter
+	def proper(self, value: Any) -> Exception:
+		self.CANNOT_SET_PROPER_CLASS.panic()
+
+	@proper.getter
+	def proper(self) -> str:
+		return self.classify(self.properSpace / self.properTime)
+
+	def reset(self) -> None:
+		self.experiencedTime = self.experiencedSpace = self.properTime = self.properSpace = 0
 
 class Body(ABC):
 	def __init__(self, id: str, location: vector, **charges: dict[str, Any]) -> None:
@@ -40,7 +76,7 @@ class Body(ABC):
 
 		self.signature = set(charges.keys())
 
-		self.classif.
+		self.classif = ClassificationTracker()
 
 	@abstractmethod
 	def atoms(self) -> Iterable[Atom]:
