@@ -149,6 +149,66 @@ class SystemFailure(Exception):
 		if self.fatality == self.FATAL:
 			raise self
 
-class GellMannMatrix:
-	def __call__(x):
-		return x
+# antired = cyan
+# antigreen = purple
+# antiblue = yellow
+
+__isqrt3 = 1/sqrt(3)
+
+GELL_MANN = {
+	# L_1: red and cyan
+	1: [
+		[0, 1, 0],
+		[1, 0, 0], 
+		[0, 0, 0]
+	],
+
+	# L_2: green and purple
+	2: [
+		[0,  -1j, 0],
+		[1j, 0,   0],
+		[0,  0,   0]
+	],
+
+	# L_3: blue and yellow
+	3: [
+		[1, 0,  0],
+		[0, -1, 0],
+		[0, 0,  0]
+	],
+
+	# L_4: red, cyan, green or red, cyan, purple
+	4: [
+		[0, 0, 1],
+		[0, 0, 0],
+		[1, 0, 0]
+	],
+
+	# L_5: red, cyan, blue red, cyan, yellow
+	5: [
+		[0,  0, -1j],
+		[0,  0, 0  ],
+		[1j, 0, 0  ]
+	],
+
+	# L_6: green, purple, blue or green, purple, yellow
+	6: [
+		[0, 0, 0],
+		[0, 0, 1],
+		[0, 1, 0]
+	],
+
+	# L_7: blue, yellow, red or blue, yellow, cyan
+	7: [
+		[0, 0,  0  ],
+		[0, 0,  -1j],
+		[0, 1j, 0  ]
+	],
+
+	# L_8: red, green, blue or cyan, purple, yellow
+	8: [
+		[__isqrt3, 0,        0            ],
+		[0,        __isqrt3, 0            ],
+		[0,        0,        -2 * __isqrt3]
+	]
+}
