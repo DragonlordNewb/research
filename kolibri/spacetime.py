@@ -8,7 +8,7 @@ class Spacetime:
 	def __init__(self) -> None:
 		self._metric: Metric = None
 		self.bodies = []
-		self.fields = [
+		self.fields = []
 
 	@property
 	def metric(self) -> None:
