@@ -134,4 +134,21 @@ class Calculus:
 		g = self.gradient(f, v)
 		return g.x + g.y + g.z
 	
-	
+class SystemFailure(Exception):
+	NONFATAL = "NONFATAL"
+	FATAL = "FATAL"
+
+	def __init__(self, fatality: str, error: str, description: str) -> None:
+		Exception.__init__(self, error)
+		self.description = description
+		self.fatality = fatality
+
+	def panic(self) -> Exception:
+		print(self.fatality + " SYSTEM FAILURE: " + self.error)
+		print("\t" + self.description.replace("\n", "\t\n"))
+		if self.fatality == self.FATAL:
+			raise self
+
+class GellMannMatrix:
+	def __call__(x):
+		return x
