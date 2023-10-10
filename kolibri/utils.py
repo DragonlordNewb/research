@@ -153,7 +153,9 @@ class SystemFailure(Exception):
 
 __isqrt3 = 1/sqrt(3)
 
-GELL_MANN = {
+class GellMann:
+
+	MATRICES = {
 	# L_1: red and cyan
 	1: [
 		[0, 1, 0],
@@ -210,3 +212,28 @@ GELL_MANN = {
 		[0,        0,        -2 * __isqrt3]
 	]
 }
+
+	def __init__(self, index: int) -> None:
+		self.index = index
+		self.matrix = self.MATRICES[index] 
+
+	def __mul__(self, other: "GellMann") -> Scalar:
+		matrix1 = self.matrix
+		matrix2 = other.matrix
+		p1 = self.multiply3x3(matrix1, matrix2)
+		p2 = self.multiply3x3(matrix2, matrix1)
+		s = self.add3x3(p1, p2)
+
+	@staticmethod
+	def add3x3(matrix1: list[list[Scalar]], matrix2: list[list[Scalar]]) -> list[list[Scalar]]:
+		return [[matrix1[r][c] + matrix2[r][c] for c in range(3)] for r in range(3)]
+
+	@staticmethod
+	def multiply3x3(matrix1: list[list[Scalar]], matrix2: list[list[Scalar]]) -> list[list[Scalar]]:
+		((a, b, c), (d, e, f), (g, h, i)) = matrix1
+		((j, k, l), (m, n, o), (p, q, r)) = matrix2
+		return [
+			[(a * j) + (b * m) + (c * p), (a * k) + (b * n) + (c * q), (a * l) + (b * o) + (c * r)],
+			[(d * j) + (e * m) + (f * p), (d * k) + (e * n) + (f * q), (d * l) + (e * o) + (f * r)],
+			[(g * j) + (h * m) + (i * p), (g * k) + (h * n) + (i * q), (g * l) + (h * o) + (i * r)]
+		]
