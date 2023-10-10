@@ -125,10 +125,7 @@ class Calculus:
 
 	def gradient(self, f: Callable[[Vector], Scalar], v: Vector) -> Vector:
 		i = f(v)
-		gx = (i - f(v + Vector(self.h, 0, 0))).x / self.h
-		gy = (i - f(v + Vector(0, self.h, 0))).y / self.h
-		gz = (i - f(v + Vector(0, 0, self.h))).z / self.h
-		return Vector(gx, gy, gz)
+		return (f(v + Vector(self.h, 0, 0)) - i) / self.h
 
 	def divergence(self, f: Callable[[Vector], Scalar], v: Vector) -> Vector:
 		g = self.gradient(f, v)
