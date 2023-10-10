@@ -76,7 +76,11 @@ class Body(ABC):
 
 		self.signature = set(charges.keys())
 
+		self.charges = charges
+
 		self.classif = ClassificationTracker()
+
+		self.spacetime: "Spacetime" = None
 
 	@abstractmethod
 	def atoms(self) -> Iterable[Atom]:

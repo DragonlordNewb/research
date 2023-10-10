@@ -13,8 +13,9 @@ class Spacetime:
 
 		BAD_TYPE = SystemFailure(SystemFailure.NONFATAL, "Bad type.", "Can\'t use such a type with this ComponentManager.\nOperation cancelled.")
 
-		def __init__(self) -> None:
+		def __init__(self, spacetime: "Spacetime") -> None:
 			self.items = []
+			self.spacetime = spacetime
 
 		def __contains__(self, item: object) -> bool:
 			itemHash = hash(item)
@@ -34,6 +35,7 @@ class Spacetime:
 				return
 				
 			if item not in self or self.DUPLICATES_ALLOWED:
+				item.spacetime = self.spacetime
 				self.items.append(item)
 
 		def __rrshift__(self, item: object) -> None:
@@ -56,7 +58,8 @@ class Spacetime:
 					break
 
 			if index != None:
-				self.pop(index)
+				item = self.pop(index)
+				item.spacetime = None
 
 		def __rlshift__(self, item: Union[object, int]) -> None:
 			self >> item
@@ -71,8 +74,8 @@ class Spacetime:
 	
 	def __init__(self) -> None:
 		self._metric: Metric = None
-		self.bodies = self.BodyManager()
-		self.fields = self.FieldManager()
+		self.bodies = self.BodyManager(self)
+		self.fields = self.FieldManager(self)
 
 	@property
 	def metric(self) -> None:

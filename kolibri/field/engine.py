@@ -9,15 +9,8 @@ class Field(ABC):
 		for key in kwargs.keys():
 			setattr(self, key, kwargs[key])
 
-		self._spacetime: "Spacetime" = None
+		self.spacetime: "Spacetime" = None
 
-	@property
-	def spacetime(self) -> None:
-		return
-
-	@spacetime.setter
-	def spacetime(self, value: "Spacetime") -> None:
-		if value == None and self._spacetime != None:
-			self._spacetime.field
-		self._spacetime = value
-		
+	@abstractmethod
+	def potential(self, location: Vector) -> Scalar:
+		pass
