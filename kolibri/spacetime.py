@@ -97,7 +97,7 @@ class Spacetime:
 	
 	# Functionality methods
 	
-	def tick(fieldsEnabled: bool=True) -> None:
+	def tick(self, fieldsEnabled: bool=True) -> None:
 		if fieldsEnabled:
 			pass
 		
