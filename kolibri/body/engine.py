@@ -98,5 +98,5 @@ class Body(ABC):
 	def aim(self, velocity: Vector) -> None:
 		self.velocity = velocity
 
-	def tick(self) -> None:
-		pass
+	def tick(self, resolution: Scalar) -> None:
+		self.location += vector * resolution

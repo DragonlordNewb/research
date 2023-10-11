@@ -72,10 +72,11 @@ class Spacetime:
 		TYPE = Field
 		DUPLICATES_ALLOWED = False
 	
-	def __init__(self) -> None:
+	def __init__(self, resolution: Scalar=0.000001) -> None:
 		self._metric: Metric = None
 		self.bodies = self.BodyManager(self)
 		self.fields = self.FieldManager(self)
+		self.resolution = resolution
 
 	@property
 	def metric(self) -> None:
@@ -102,4 +103,4 @@ class Spacetime:
 			pass
 		
 		for body in self.bodies:
-			body.tick()
+			body.tick(self.resolution)
