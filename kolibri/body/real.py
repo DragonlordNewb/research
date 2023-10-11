@@ -1,5 +1,5 @@
-from kolibri.body import Body
-from kolibri.body import Atom
+from kolibri.body.engine import Body
+from kolibri.body.engine import Atom
 from kolibri.utils import *
 
 class Particle(Body):
