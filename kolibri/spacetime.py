@@ -94,3 +94,12 @@ class Spacetime:
 	@metric.getter
 	def metric(self) -> Union[Metric, None]:
 		return self._metric
+	
+	# Functionality methods
+	
+	def tick(fieldsEnabled: bool=True) -> None:
+		if fieldsEnabled:
+			pass
+		
+		for body in self.bodies:
+			body.tick()
