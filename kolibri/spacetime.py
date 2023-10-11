@@ -30,7 +30,7 @@ class Spacetime:
 		# Insert an object into the manager
 		
 		def __lshift__(self, item: object) -> None:
-			if type(item) != self.TYPE:
+			if not issubclass(type(item), self.TYPE):
 				self.BAD_TYPE.panic()
 				return
 				
