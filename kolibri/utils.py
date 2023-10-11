@@ -151,7 +151,7 @@ class SystemFailure(Exception):
 # antigreen = purple
 # antiblue = yellow
 
-_Gell_Mann__isqrt3 = 1/sqrt(3)
+_GellMann__isqrt3 = 1/sqrt(3)
 
 class GellMann:
 
