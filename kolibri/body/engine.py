@@ -85,3 +85,18 @@ class Body(ABC):
 	@abstractmethod
 	def atoms(self) -> Iterable[Atom]:
 		pass
+	
+	def displace(self, displacement: Vector) -> None:
+		self.location += displacement
+
+	def move(self, location: Vector) -> None:
+		self.location = location
+	
+	def accelerate(self, acceleration: Vector) -> None:
+		self.velocity += acceleration
+
+	def aim(self, velocity: Vector) -> None:
+		self.velocity = velocity
+
+	def tick(self) -> None:
+		pass
