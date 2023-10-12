@@ -70,16 +70,16 @@ class Vector:
 
 	def __mul__(self, factor: Scalar) -> "Vector":
 		return Vector(
-			x = self.x * factor,
-			y = self.y * factor,
-			z = self.z * factor
+			x = self.x * Decimal(factor),
+			y = self.y * Decimal(factor),
+			z = self.z * Decimal(factor)
 		)
 
 	def __truediv__(self, factor: Scalar) -> "Vector":
 		return Vector(
-			x = self.x / factor,
-			y = self.y / factor,
-			z = self.z / factor
+			x = self.x / Decimal(factor),
+			y = self.y / Decimal(factor),
+			z = self.z / Decimal(factor)
 		)
 
 	def __iadd__(self, other: "Vector") -> "Vector":
