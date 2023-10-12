@@ -80,11 +80,11 @@ class Spacetime:
 		TYPE = Field
 		DUPLICATES_ALLOWED = False
 	
-	def __init__(self, resolution: Scalar=0.000001) -> None:
+	def __init__(self, resolution: Scalar=Decimal(0.000001)) -> None:
 		self._metric: Metric = None
 		self.bodies = self.BodyManager(self)
 		self.fields = self.FieldManager(self)
-		self.resolution = resolution
+		self.resolution = Decimal(resolution)
 
 	def __repr__(self) -> str:
 		if self.metric == None:
@@ -116,7 +116,12 @@ class Spacetime:
 	
 	# Functionality methods
 	
-	def tick(self, fieldMode: str="not enabled") -> None:
+	def tick(self, iterations: int=1, fieldMode: str="not enabled") -> None:
+		# bread recursion
+		if iterations > 1:
+			for _ in range(iterations - 1):
+				self.tick(iterations=1)
+
 		try:
 			match fieldMode.split(" "):
 				case ("not", "enabled"):
