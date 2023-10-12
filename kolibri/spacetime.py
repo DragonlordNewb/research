@@ -129,6 +129,7 @@ class Spacetime:
 						pass
 
 		except:
+			pass
 		
 		for body in self.bodies:
 			body.tick(self.resolution)
