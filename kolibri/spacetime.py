@@ -22,6 +22,9 @@ class Spacetime:
 			self.items = []
 			self.spacetime = spacetime
 
+		def __len__(self) -> int:
+			return len(self.items)
+
 		def __contains__(self, item: object) -> bool:
 			itemHash = hash(item)
 			for otherItem in self:

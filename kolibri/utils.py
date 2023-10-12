@@ -131,7 +131,7 @@ class Calculus:
 		g = self.gradient(f, v)
 		return g.x + g.y + g.z
 	
-class SystemFailure(Exception):
+class SystemFailure(BaseException):
 	NONFATAL = "NONFATAL"
 	FATAL = "FATAL"
 
