@@ -136,7 +136,7 @@ class SystemFailure(BaseException):
 	FATAL = "FATAL"
 
 	def __init__(self, fatality: str, error: str, description: str) -> None:
-		Exception.__init__(self, error)
+		BaseException.__init__(self, error)
 		self.error = error
 		self.description = description
 		self.fatality = fatality

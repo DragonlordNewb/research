@@ -128,8 +128,7 @@ class Spacetime:
 					if t == "atoms":
 						pass
 
-		except self.FIELDS_NOT_ENABLED as e:
-			e.panic()
+		except:
 		
 		for body in self.bodies:
 			body.tick(self.resolution)
