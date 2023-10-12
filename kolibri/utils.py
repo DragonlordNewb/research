@@ -6,7 +6,9 @@ from typing import Callable
 
 from math import sqrt
 
-Scalar = Union[int, float]
+from decimal import Decimal
+
+Scalar = Union[int, float, Decimal]
 
 class Vector:
 
@@ -15,13 +17,13 @@ class Vector:
 	"""
 
 	def __init__(self, x: Scalar, y: Scalar, z: Scalar) -> None:
-		self.x, self.y, self.z = x, y, z
+		self.x, self.y, self.z = list(map(Decimal, (x, y, z)))
 
 	def __repr__(self) -> str:
 		return "<" + ", ".join(map(str, self)) + ">"
 
 	def __abs__(self) -> Scalar:
-		return sqrt((self.x ** 2) + (self.y ** 2) + (self.z ** 2))
+		return Decimal(sqrt((self.x ** 2) + (self.y ** 2) + (self.z ** 2)))
 
 	def __iter__(self) -> Iterable[Scalar]:
 		return iter((self.x, self.y, self.z))
@@ -35,17 +37,17 @@ class Vector:
 	# Vector operations
 
 	def dot(self, other: "Vector") -> Scalar:
-		return sum([xn * yn for xn, yn in zip(self, other)])
+		return Decimal(sum([xn * yn for xn, yn in zip(self, other)]))
 
 	def cross(self, other: "Vector") -> "Vector":
 		return Vector(
-			x = (self.y * other.z) - (self.z * other.y),
-			y = (self.x * other.z) - (self.z * other.x),
-			z = (self.x * other.y) - (self.y * other.x)
+			x = Decimal(self.y * other.z) - Decimal(self.z * other.y),
+			y = Decimal(self.x * other.z) - Decimal(self.z * other.x),
+			z = Decimal(self.x * other.y) - Decimal(self.y * other.x)
 		)
 
 	def angle(self, other: "Vector") -> Scalar:
-		return acos((Vector.dot(self, other)) / (abs(self) * abs(other)))
+		return Decimal(acos((Vector.dot(self, other)) / (abs(self) * abs(other))))
 
 	def normal(self) -> "Vector":
 		return self / abs(self)

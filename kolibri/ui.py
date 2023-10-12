@@ -14,3 +14,6 @@ if result != 0:
 
 del os
 del platform
+
+from tkinter import Tk
+from tkinter import 
