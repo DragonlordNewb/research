@@ -5,7 +5,12 @@ from kolibri.utils import *
 
 class Spacetime:
 
+	NOT_ENABLED = "not enabled"
+	RESOLVE_BODIES = "resolve bodies"
+	RESOLVE_ATOMS = "resolve atoms"
+
 	BAD_METRIC_TYPE = SystemFailure(SystemFailure.FATAL, "Bad metric type.", "The metric type provided is not of type kolibri.metric.Metric or NoneType.\nOnly Metric objects or None can be provided.")
+	FIELDS_NOT_ENABLED = SystemFailure(SystemFailure.NONFATAL, "Fields not enabled.", "May cause anomalous behavior in spacetime simulation to tick this way.")
 
 	class ComponentManager:
 		TYPE: type
@@ -78,6 +83,14 @@ class Spacetime:
 		self.fields = self.FieldManager(self)
 		self.resolution = resolution
 
+	def __repr__(self) -> str:
+		if self.metric == None:
+			m = "Metricless"
+		else:
+			mc = self.metric
+			m = type(mc).__name__
+		return "<" + m + " Spacetime with " + repr(len(self.bodies)) + " bodies>"
+
 	@property
 	def metric(self) -> None:
 		return
@@ -86,11 +99,13 @@ class Spacetime:
 	def metric(self, m: Metric) -> None:
 		if not issubclass(type(m), Metric):
 			self.BAD_METRIC_TYPE.panic()
+
 		if self._metric != None:
-			self._metric._spacetime = None
+			self._metric.spacetime = None
 			self._metric = None
 
-		self.metric = m
+		self._metric = m
+		self._metric.spacetime = self
 
 	@metric.getter
 	def metric(self) -> Union[Metric, None]:
@@ -98,9 +113,20 @@ class Spacetime:
 	
 	# Functionality methods
 	
-	def tick(self, fieldsEnabled: bool=True) -> None:
-		if fieldsEnabled:
-			pass
+	def tick(self, fieldMode: str="not enabled") -> None:
+		try:
+			match fieldMode.split(" "):
+				case ("not", "enabled"):
+					raise self.FIELDS_NOT_ENABLED
+				case ("resolve", t):
+					if t == "bodies":
+						pass
+					
+					if t == "atoms":
+						pass
+
+		except self.FIELDS_NOT_ENABLED as e:
+			e.panic()
 		
 		for body in self.bodies:
 			body.tick(self.resolution)

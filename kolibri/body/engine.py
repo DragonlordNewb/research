@@ -82,6 +82,9 @@ class Body(ABC):
 
 		self.spacetime: "Spacetime" = None
 
+	def __repr__(self) -> str:
+		return "<" + type(self).__name__ + " body at " + repr(self.location) + ">"
+
 	@abstractmethod
 	def atoms(self) -> Iterable[Atom]:
 		pass
@@ -99,4 +102,17 @@ class Body(ABC):
 		self.velocity = velocity
 
 	def tick(self, resolution: Scalar) -> None:
-		self.location += vector * resolution
+		properTime = resolution
+		properSpace = self.velocity * resolution
+
+		timewarp, spacewarp = self.spacetime.metric.warps(self.location)
+
+		experiencedTime = properTime * timewarp
+		experiencedSpace = self.velocity * (resolution * timewarp) * spacewarp
+
+		self.classif.properTime += properTime
+		self.classif.properSpace += abs(properSpace)
+		self.classif.experiencedTime += experiencedTime
+		self.classif.experiencedSpace += abs(experiencedSpace)
+
+		self.location += experiencedSpace

@@ -15,4 +15,3 @@ class Field(ABC):
 	@abstractmethod
 	def potential(self, location: Vector) -> Scalar:
 		pass
-	
