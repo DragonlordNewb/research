@@ -8,7 +8,38 @@ from math import sqrt
 
 from decimal import Decimal
 
+import sys
+
 Scalar = Union[int, float, Decimal]
+
+class ProgressBar:
+	def __init__(self, iterable, label: str="Processing: ", length=None, fillchar='#', width=100):
+		self.iterable = iterable
+		self.length = length if length is not None else len(iterable)
+		self.fillchar = fillchar
+		self.width = width
+		self.label = label
+
+	def __iter__(self):
+		self.progress = 0
+		self.iterator = iter(self.iterable)
+		return self
+
+	def __next__(self):
+		try:
+			item = next(self.iterator)
+		except StopIteration:
+			sys.stdout.write('\n')
+			raise StopIteration
+
+		self.progress += 1
+		percentage = self.progress / self.length
+		filledwidth = int(self.width * percentage)
+		bar = f'{self.fillchar * filledwidth}{" " * (self.width - filledwidth)}'
+		sys.stdout.write('\r' + self.label + f'[{bar}] {percentage * 100:.1f}%')
+		sys.stdout.flush()
+
+		return item
 
 class Vector:
 
@@ -115,11 +146,11 @@ class Vector:
 			weightedSum += vector * weight
 
 		return weightedSum / totalWeight
-	
+
 	@classmethod
 	def zero(cls) -> "Vector":
 		return cls(0, 0, 0)
-	
+
 class Calculus:
 
 	def __init__(self, h: Scalar=0.000001) -> None:
