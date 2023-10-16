@@ -5,12 +5,20 @@ from typing import Any
 from typing import Callable
 
 from math import sqrt
+from math import acos
 
 from decimal import Decimal
 
 import sys
 
 Scalar = Union[int, float, Decimal]
+
+def sgn(x: Scalar) -> int:
+	if x > 0:
+		return 1
+	if x < 0:
+		return -1
+	return 0
 
 class ProgressBar:
 	def __init__(self, iterable, label: str="Processing: ", length=None, fillchar='#', width=100):
@@ -154,6 +162,11 @@ class Vector:
 	@classmethod
 	def zero(cls) -> "Vector":
 		return cls(0, 0, 0)
+
+	def toPolar(self) -> "Vector":
+		r = abs(self)
+		theta = self.z / r
+		phi = sgn(self.y) * self.x / sqrt((self.x ** 2) + (self.y ** 2))
 
 class Calculus:
 
