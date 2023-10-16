@@ -1,11 +1,12 @@
 import kolibri
-st = kolibri.spacetime.Spacetime(resolution=0.000001)
+
+st = kolibri.spacetime.Spacetime()
 st.metric = kolibri.metric.real.Minkowski()
+
 p = kolibri.body.real.Particle("p", kolibri.Vector(0, 0, 0))
-p.accelerate(kolibri.Vector(1, 0, 0))
+p.accelerate(kolibri.Vector(1, 2, 3))
 st.bodies << p
 
-print(p)
-for _ in range(10):
-	st.tick(iterations=100000)
-	print(p)
+print("Before:", p)
+st.tick(iterations=1000000)
+print("After:", p)

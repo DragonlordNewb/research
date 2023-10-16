@@ -40,7 +40,7 @@ class ClassificationTracker:
 	@property
 	def experienced(self) -> None:
 		return
-	
+
 	@experienced.setter
 	def experienced(self, value: Any) -> Exception:
 		self.CANNOT_SET_EXPERIENCED_CLASS.panic()
@@ -52,7 +52,7 @@ class ClassificationTracker:
 	@property
 	def proper(self) -> None:
 		return
-	
+
 	@proper.setter
 	def proper(self, value: Any) -> Exception:
 		self.CANNOT_SET_PROPER_CLASS.panic()
@@ -65,11 +65,12 @@ class ClassificationTracker:
 		self.experiencedTime = self.experiencedSpace = self.properTime = self.properSpace = 0
 
 class Body(ABC):
-	def __init__(self, id: str, location: Vector, **charges: dict[str, Any]) -> None:
+
+	def __init__(self, id: str, location: Vector, velocity: Vector=Vector(0, 0, 0), **charges: dict[str, Any]) -> None:
 		self.id = id
 
 		self.location = location
-		self.velocity = Vector.zero()
+		self.velocity = velocity
 
 		for key in charges.keys():
 			setattr(self, key, charges[key])
@@ -88,13 +89,13 @@ class Body(ABC):
 	@abstractmethod
 	def atoms(self) -> Iterable[Atom]:
 		pass
-	
+
 	def displace(self, displacement: Vector) -> None:
 		self.location += displacement
 
 	def move(self, location: Vector) -> None:
 		self.location = location
-	
+
 	def accelerate(self, acceleration: Vector) -> None:
 		self.velocity += acceleration
 
@@ -116,3 +117,10 @@ class Body(ABC):
 		self.classif.experiencedSpace += abs(experiencedSpace)
 
 		self.location += experiencedSpace
+
+		del properTime
+		del properSpace
+		del timewarp
+		del spacewarp
+		del experiencedTime
+		del experiencedSpace

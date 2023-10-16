@@ -144,3 +144,5 @@ class Spacetime:
 		for body in self.bodies:
 			body.tick(self.resolution)
 
+		del iterations
+		del fieldMode

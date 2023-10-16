@@ -39,6 +39,10 @@ class ProgressBar:
 		sys.stdout.write('\r' + self.label + f'[{bar}] {percentage * 100:.1f}%')
 		sys.stdout.flush()
 
+		del percentage
+		del filledwidth
+		del bar
+
 		return item
 
 class Vector:
