@@ -173,6 +173,8 @@ class Vector:
 		theta = self.z / r
 		phi = sgn(self.y) * self.x / sqrt((self.x ** 2) + (self.y ** 2))
 
+Value = Union[Scalar, Vector]
+
 class Calculus:
 
 	def __init__(self, h: Scalar=Decimal(0.000001)) -> None:
@@ -195,25 +197,66 @@ class Calculus:
 		
 		return Decimal(differential(x))
 	
-	def integral(self, f: Callable[[Scalar], Scalar], a: Scalar, b: Scalar) -> Scalar:
+	def integral(self, f: Callable[[Scalar], Scalar], a: Scalar=None, b: Scalar=None) -> Scalar:
 		"""
 		Perform procedural integration (may take a long time depending on h).
 		"""
 
-		if a == b:
-			return Decimal(0)
-		
-		if a > b:
-			return self.integral(f, b, a)
-		
-		i = 0
-		x = a
+		def integrate(j: Scalar, k: Scalar) -> Scalar:
+			if j == k:
+				return Decimal(0)
+			
+			if j > k:
+				return integrate(f, k, j)
+			
+			i = 0
+			x = j
 
-		while x < b:
-			i += f(x) * self.h
-			x += self.h
+			while x < k:
+				i += f(x) * self.h
+				x += self.h
 
-		return i
+			return i
+
+		if None in (a, b):
+			return integrate
+		
+		return Decimal(integrate(a, b))
+	
+	def curveIntegral(self, f: Callable[[Vector], Scalar], c: Callable[[Scalar], Vector], a: Scalar=None, b: Scalar=None) -> Scalar:
+		"""
+		Integrate over a parameterized curve.
+		"""
+
+		def integrateCurve(j: Scalar, k: Scalar) -> Scalar:
+			i = 0
+			x = j
+
+			while x < k:
+				i += f(c(x)) * self.h 
+				x += self.h
+
+			return i
+		
+		if None in (a, b):
+			return integrateCurve
+		
+		return integrateCurve(a, b)
+	
+	def lineIntegral(self, f: Callable[[Vector], Scalar], a: Vector=None, b: Vector=None) -> Scalar:
+		"""
+		Integrate over a line - essentially a high-level Calculus.curveIntegral
+		"""
+		
+		def lineIntegral(x: Vector, y: Vector) -> Scalar:
+			dx = y - x
+			c = lambda p: x + (dx * p)
+			return self.curveIntegral(f, c, 0, 1)
+		
+		if None in (a, b):
+			return lineIntegral
+		
+		return lineIntegral(a, b)
 
 	def gradient(self, f: Callable[[Vector], Scalar], v: Vector=None) -> Vector:
 		"""
