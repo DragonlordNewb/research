@@ -124,3 +124,37 @@ class Body(ABC):
 		del spacewarp
 		del experiencedTime
 		del experiencedSpace
+
+	@property
+	def totalEnergy(self) -> None:
+		return
+	
+	@totalEnergy.setter
+	def totalEnergy(self) -> Exception:
+		raise SyntaxError("totalEnergy can\'t be directly set.")
+	
+	@totalEnergy.getter
+	def totalEnergy(self) -> Scalar:
+		gamma = Decimal(1 / sqrt(1 - ((abs(self.velocity) / c) ** 2)))
+		if "mass" in self.charges.keys():
+			re = self.charges["mass"] * c2
+		if "energy" in self.charges.keys():
+			re = self.charges["energy"]
+		ke = re * (abs(self.velocity) ** 2) / Decimal(2 * c2)
+		return Decimal(gamma * (re + ke))
+	
+	@property
+	def mass(self) -> None:
+		return
+	
+	@mass.setter
+	def mass(self) -> Exception:
+		raise SyntaxError("mass can\'t be directly set.")
+	
+	@mass.getter
+	def mass(self) -> Scalar:
+		gamma = Decimal(1 / sqrt(1 - ((abs(self.velocity) / c) ** 2)))
+		if "mass" in self.charges.keys():
+			return self.charges["mass"] * gamma
+		elif "energy" in self.charges.keys():
+			return self.charges["energy"] * gamma / c2

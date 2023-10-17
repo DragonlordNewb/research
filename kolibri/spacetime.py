@@ -119,10 +119,16 @@ class Spacetime:
 
 	# Functionality methods
 
-	def tick(self, iterations: int=1, fieldMode: str="not enabled", _fieldNotEnabledWarned: bool=False) -> None:
+	def tick(self, iterations: int=1, fieldMode: str="not enabled", _fieldNotEnabledWarned: bool=False, pbar: bool=False) -> None:
 		# bread recursion
 		if iterations > 1:
-			for iteration in ProgressBar(range(iterations)):
+			if pbar:
+				iterator = ProgressBar(range(iterations))
+			else:
+				iterator = range(iterations)
+
+			for iteration in iterator:
+
 				self.tick(iterations=1, _fieldNotEnabledWarned=_fieldNotEnabledWarned)
 				if _fieldNotEnabledWarned == False:
 					_fieldNotEnabledWarned = True
