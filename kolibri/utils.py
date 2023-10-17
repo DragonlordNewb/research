@@ -72,6 +72,8 @@ class Vector:
 		return iter((self.x, self.y, self.z))
 
 	def __eq__(self, other: "Vector") -> bool:
+		if type(other) != Vector:
+			return False
 		return (self.x, self.y, self.z) == (other.x, other.y, other.z)
 
 	def __neq__(self, other: "Vector") -> bool:
@@ -170,17 +172,113 @@ class Vector:
 
 class Calculus:
 
-	def __init__(self, h: Scalar=0.000001) -> None:
-		self.h = h
+	def __init__(self, h: Scalar=Decimal(0.000001)) -> None:
+		self.h = Decimal(h)
 
-	def gradient(self, f: Callable[[Vector], Scalar], v: Vector) -> Vector:
-		i = f(v)
-		return (f(v + Vector(self.h, 0, 0)) - i) / self.h
+		self.dx = Vector(self.h, 0, 0)
+		self.dy = Vector(0, self.h, 0)
+		self.dz = Vector(0, 0, self.h)
 
-	def divergence(self, f: Callable[[Vector], Scalar], v: Vector) -> Vector:
-		g = self.gradient(f, v)
-		return g.x + g.y + g.z
+	def differential(self, f: Callable[[Scalar], Scalar], x: Scalar=None) -> Scalar:
+		"""
+		Use the definition of a derivative to perform differentiation.
+		"""
+
+		def differential(y: Scalar) -> Scalar:
+			return (f(y + self.h) - f(y)) / self.h
+		
+		if x == None:
+			return differential
+		
+		return Decimal(differential(x))
 	
+	def integral(self, f: Callable[[Scalar], Scalar], a: Scalar, b: Scalar) -> Scalar:
+		"""
+		Perform procedural integration (may take a long time depending on h).
+		"""
+
+		if a == b:
+			return Decimal(0)
+		
+		if a > b:
+			return self.integral(f, b, a)
+		
+		i = 0
+		x = a
+
+		while x < b:
+			i += f(x) * self.h
+			x += self.h
+
+		return i
+
+	def gradient(self, f: Callable[[Vector], Scalar], v: Vector=None) -> Vector:
+		"""
+		The gradient of a scalar field is a vector field giving
+		the magnitude and direction of maximum increase at a given point.
+		"""
+		
+		def gradientField(u: Vector) -> Vector:
+			return Vector(
+				(f(u + self.dx) - f(u)) / self.h,
+				(f(u + self.dy) - f(u)) / self.h,
+				(f(u + self.dz) - f(u)) / self.h,
+			)
+
+		if v == None:
+			return gradientField
+
+		return gradientField(v)
+
+	def divergence(self, f: Callable[[Vector], Vector], v: Vector=None) -> Scalar:
+		"""
+		The divergence of a vector field is a scalar field
+		associated with the vector field's tendency to diverge
+		to or from a given point.
+		"""
+
+		def divergenceField(u: Vector) -> Scalar:
+			return Decimal(sum((
+				((f(u + self.dx) - f(u)) / self.h).x,
+				((f(u + self.dy) - f(u)) / self.h).y,
+				((f(u + self.dz) - f(u)) / self.h).z
+			)))
+
+		if v == None:
+			return divergenceField
+
+		return divergenceField(v) 
+	
+	def curl(self, f: Callable[[Vector], Vector], v: Vector=None) -> Vector:
+		"""
+		The curl of a vector field is another vector field that roughly
+		gives the magnitude of angular torque that would be applied to a 
+		tiny pinwheel placed in the first vector field.
+		"""
+
+		def curlField(u: Vector) -> Vector:
+			i = f(u)
+
+			dzdy = ((f(u + self.dy) - i) / self.h).z
+			dydz = ((f(u + self.dz) - i) / self.h).y
+
+			dxdz = ((f(u + self.dz) - i) / self.h).x
+			dzdx = ((f(u + self.dx) - i) / self.h).z
+
+			dydx = ((f(u + self.dx) - i) / self.h).y
+			dxdy = ((f(u + self.dy) - i) / self.h).x
+
+			return Vector(
+				x = dzdy - dydz,
+				y = dxdz - dzdx,
+				z = dydx - dxdy
+			)
+	
+		if v == None:
+			return curlField
+		
+		return curlField(v)
+
 class SystemFailure(BaseException):
 	NONFATAL = "NONFATAL"
 	FATAL = "FATAL"
