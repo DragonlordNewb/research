@@ -142,6 +142,9 @@ class Vector:
 	def __itruediv__(self, other: "Vector") -> "Vector":
 		return self / other
 
+	def __neg__(self) -> "Vector":
+		return self * -1
+
 	# Miscellaneous
 
 	@staticmethod
