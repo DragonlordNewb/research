@@ -130,7 +130,7 @@ class Body(ABC):
 		return
 	
 	@totalEnergy.setter
-	def totalEnergy(self) -> Exception:
+	def totalEnergy(self, value: Any) -> Exception:
 		raise SyntaxError("totalEnergy can\'t be directly set.")
 	
 	@totalEnergy.getter
@@ -148,7 +148,7 @@ class Body(ABC):
 		return
 	
 	@mass.setter
-	def mass(self) -> Exception:
+	def mass(self, value: Any) -> Exception:
 		raise SyntaxError("mass can\'t be directly set.")
 	
 	@mass.getter

@@ -1,5 +1,6 @@
 from kolibri.metric import Metric
 from kolibri.body import Body
+from kolibri.body import Atom
 from kolibri.field import Field
 from kolibri.utils import *
 
@@ -116,10 +117,24 @@ class Spacetime:
 	@metric.getter
 	def metric(self) -> Union[Metric, None]:
 		return self._metric
+	
+	@property
+	def atoms(self) -> None:
+		return
+	
+	@atoms.setter
+	def atoms(self, value: Any) -> Exception:
+		raise SyntaxError("Can\'t directly set atoms property of Spacetime.")
+	
+	@atoms.getter
+	def atoms(self) -> Iterable[Atom]:
+		for body in self.bodies:
+			for atom in body.atoms():
+				yield atom
 
 	# Functionality methods
 
-	def tick(self, iterations: int=1, fieldMode: str="not enabled", _fieldNotEnabledWarned: bool=False, pbar: bool=False) -> None:
+	def tick(self, iterations: int=1, fieldMode: bool, _fieldNotEnabledWarned: bool=False, pbar: bool=False) -> None:
 		# bread recursion
 		if iterations > 1:
 			if pbar:
@@ -135,20 +150,11 @@ class Spacetime:
 
 			return
 
-		try:
-			match fieldMode.split(" "):
-				case ("not", "enabled"):
-					if not _fieldNotEnabledWarned:
-						self.FIELDS_NOT_ENABLED.panic()
-				case ("resolve", t):
-					if t == "bodies":
-						pass
+		if not fieldMode:
+			if not _fieldNotEnabledWarned:
+		else:
+			for atom in 
 
-					if t == "atoms":
-						pass
-
-		except:
-			pass
 
 		for body in self.bodies:
 			body.tick(self.resolution)
