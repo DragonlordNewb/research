@@ -119,18 +119,21 @@ class Spacetime:
 
 	# Functionality methods
 
-	def tick(self, iterations: int=1, fieldMode: str="not enabled") -> None:
+	def tick(self, iterations: int=1, fieldMode: str="not enabled", _fieldNotEnabledWarned: bool=False) -> None:
 		# bread recursion
 		if iterations > 1:
 			for iteration in ProgressBar(range(iterations)):
-				self.tick(iterations=1)
+				self.tick(iterations=1, _fieldNotEnabledWarned=_fieldNotEnabledWarned)
+				if _fieldNotEnabledWarned == False:
+					_fieldNotEnabledWarned = True
 
 			return
 
 		try:
 			match fieldMode.split(" "):
 				case ("not", "enabled"):
-					raise self.FIELDS_NOT_ENABLED
+					if not _fieldNotEnabledWarned:
+						self.FIELDS_NOT_ENABLED.panic()
 				case ("resolve", t):
 					if t == "bodies":
 						pass
