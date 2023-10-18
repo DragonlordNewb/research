@@ -56,6 +56,18 @@ class Kolibri:
 			case ("tick", x):
 				print("Ticking ...")
 				self.st.tick(int(x), pbar=True)
+			case ("trace", id, x):
+				targetBody = None
+				for b in self.st.bodies:
+					if b.id == id:
+						targetBody = b
+						break
+				if targetBody == None:
+					print("No such body.")
+					return
+				for _ in range(int(x)):
+					self.st.tick()
+					print("\r", targetBody.location, end="")
 			case _:
 				print("Unknown or invalid command:", " ".join(cmd))
 
