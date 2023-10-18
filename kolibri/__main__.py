@@ -42,7 +42,7 @@ class Kolibri:
 					bodyType = body.engine.Body.lookup(t)
 				except KeyError:
 					print("Error: no such body type.")
-				kwargs = {i.split("=")[0]: Decimal(i.split("=")[1] for i in kwargs}
+				kwargs = {i.split("=")[0]: Decimal(i.split("=")[1]) for i in kwargs}
 				l = Vector(Decimal(x), Decimal(y), Decimal(z))
 				body = t(name, l, **kwargs)
 				self.st.bodies << body
