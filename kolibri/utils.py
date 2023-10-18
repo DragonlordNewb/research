@@ -327,6 +327,19 @@ class Calculus:
 			return curlField
 		
 		return curlField(v)
+		
+	def laplacian(self, f: Callable[[Vector], Scalar], v: Vector=None) -> Scalar:
+		"""
+  		The Laplacian of a scalar field is the divergence of its gradient.
+  		"""
+		
+		def laplacianField(x: Vector) -> Scalar:
+			return self.divergence(self.gradient(f, x), x)
+			
+		if v == None:
+			return laplacianField
+			
+		return laplacianField(v)
 
 class SystemFailure(BaseException):
 	NONFATAL = "NONFATAL"
