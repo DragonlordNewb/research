@@ -1,0 +1,7 @@
+field + gravitywell { };
+body + particle p { energy=1 } at 1000 2000 3000;
+metric set minkowski;
+
+body locate p;
+trace p 100000;
+body locate p;

@@ -2,11 +2,13 @@ from kolibri.utils import *
 from kolibri.constants import *
 
 class Atom:
-	def __init__(self, location: Vector, **charges: dict[str, Any]) -> None:
+	def __init__(self, parent: "Body", location: Vector, **charges: dict[str, Any]) -> None:
 		self.location = location
 
 		for key in charges.keys():
 			setattr(self, key, charges[key])
+
+		self.charges = charges
 
 		self.signature = set(charges.keys())
 
@@ -81,9 +83,6 @@ class Body(ABC):
 
 		self.location = location
 		self.velocity = velocity
-
-		for key in charges.keys():
-			setattr(self, key, charges[key])
 
 		self.signature = set(charges.keys())
 
@@ -171,3 +170,6 @@ class Body(ABC):
 			return self.charges["mass"] * gamma
 		elif "energy" in self.charges.keys():
 			return self.charges["energy"] * gamma / c2
+		
+	def makeAtom(self, *args, **kwargs):
+		return Atom(self, *args, **kwargs)

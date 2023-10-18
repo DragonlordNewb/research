@@ -5,4 +5,4 @@ from kolibri.utils import *
 @Body.register("particle")
 class Particle(Body):
 	def atoms(self) -> Iterable[Atom]:
-		return [Atom(self.location, **self.charges)]
+		return [self.makeAtom(self.location, **self.charges)]

@@ -1,4 +1,5 @@
 from kolibri.utils import *
+from kolibri.body.engine import Atom
 
 class Field(ABC):
 
@@ -25,5 +26,9 @@ class Field(ABC):
 		self.calculus = Calculus(h)
 
 	@abstractmethod
-	def potential(self, location: Vector) -> Scalar:
+	def potential(self, spacetime: "Spacetime", atom: Atom) -> Callable[[Vector], Scalar]:
+		pass
+
+	@abstractmethod
+	def coupling(self, atom: Atom) -> Scalar:
 		pass
