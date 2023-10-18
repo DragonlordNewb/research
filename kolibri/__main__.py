@@ -36,8 +36,28 @@ class Kolibri:
 				print("Selected metric is of type " + repr(type(m)) + ".")
 				self.st.metric = m
 				print("Successfully set metric.")
+			case ("body", "add", t, name, "{", *kwargs, "}", "at", x, y, z):
+				print("Assembling body ...")
+				try:
+					bodyType = body.engine.Body.lookup(t)
+				except KeyError:
+					print("Error: no such body type.")
+				kwargs = {i.split("=")[0]: Decimal(i.split("=")[1] for i in kwargs}
+				l = Vector(Decimal(x), Decimal(y), Decimal(z))
+				body = t(name, l, **kwargs)
+				self.st.bodies << body
+				print("Body successfully assembled.")
+			case ("body", "locate", id):
+				for b in self.st.bodies:
+					if b.id == id:
+						print(id, "is located at", b.location)
+						return
+				print("No such body.")
+			case ("tick", x):
+				print("Ticking ...")
+				self.st.tick(int(x), pbar=True)
 			case _:
-				print("Unknown command.")
+				print("Unknown or invalid command:", " ".join(cmd))
 
 if __name__ == "__main__":
 	k = Kolibri()
