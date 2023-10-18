@@ -4,4 +4,4 @@ from kolibri.utils import *
 
 class Particle(Body):
 	def atoms(self) -> Iterable[Atom]:
-		return Atom(self.locationm, **self.charges)
+		return [Atom(self.location, **self.charges)]

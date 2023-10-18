@@ -88,6 +88,7 @@ class Spacetime:
 		self.bodies = self.BodyManager(self)
 		self.fields = self.FieldManager(self)
 		self.resolution = Decimal(resolution)
+		self.calculus = Calculus(self.resolution)
 		self.memoryAllowance = memoryAllowance
 
 	def __repr__(self) -> str:
@@ -127,10 +128,10 @@ class Spacetime:
 		raise SyntaxError("Can\'t directly set atoms property of Spacetime.")
 	
 	@atoms.getter
-	def atoms(self) -> Iterable[Atom]:
+	def atoms(self) -> Iterable[tuple[Body, Atom]]:
 		for body in self.bodies:
 			for atom in body.atoms():
-				yield atom
+				yield (body, atom)
 
 	# Functionality methods
 
@@ -152,11 +153,14 @@ class Spacetime:
 
 		if not fieldMode:
 			if not _fieldNotEnabledWarned:
-				pass
+				self.FIELDS_NOT_ENABLED.panic()
 		else:
-			for atom in []:
-				pass
-
+			for body, atom in self.atoms:
+				for field in self.fields:
+					if field.signature.issubset(atom.signature):
+						force = self.calculus.gradient(field.potential, atom.location) * -1
+						acceleration = force / body.mass
+						body.accelerate(acceleration * self.resolution)
 
 		for body in self.bodies:
 			body.tick(self.resolution)

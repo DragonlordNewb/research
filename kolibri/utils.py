@@ -60,7 +60,7 @@ class Vector:
 	"""
 
 	def __init__(self, x: Scalar, y: Scalar, z: Scalar) -> None:
-		self.x, self.y, self.z = list(map(Decimal, (x, y, z)))
+		self.x, self.y, self.z = Decimal(x), Decimal(y), Decimal(z)
 
 	def __repr__(self) -> str:
 		return "<" + ", ".join(map(str, self)) + ">"

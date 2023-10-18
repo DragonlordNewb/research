@@ -153,7 +153,10 @@ class Body(ABC):
 	
 	@mass.getter
 	def mass(self) -> Scalar:
-		gamma = Decimal(1 / sqrt(1 - ((abs(self.velocity) / c) ** 2)))
+		try:
+			gamma = Decimal(1 / sqrt(1 - ((abs(self.velocity) / c) ** 2)))
+		except ValueError:
+			raise RuntimeError("FTL particle detected, laws of physics break down.")
 		if "mass" in self.charges.keys():
 			return self.charges["mass"] * gamma
 		elif "energy" in self.charges.keys():
