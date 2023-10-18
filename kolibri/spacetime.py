@@ -134,7 +134,7 @@ class Spacetime:
 
 	# Functionality methods
 
-	def tick(self, iterations: int=1, fieldMode: bool, _fieldNotEnabledWarned: bool=False, pbar: bool=False) -> None:
+	def tick(self, iterations: int=1, fieldMode: bool=True, _fieldNotEnabledWarned: bool=False, pbar: bool=False) -> None:
 		# bread recursion
 		if iterations > 1:
 			if pbar:
@@ -152,8 +152,10 @@ class Spacetime:
 
 		if not fieldMode:
 			if not _fieldNotEnabledWarned:
+				pass
 		else:
-			for atom in 
+			for atom in []:
+				pass
 
 
 		for body in self.bodies:
