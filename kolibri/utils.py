@@ -434,3 +434,18 @@ class GellMann:
 			[(d * j) + (e * m) + (f * p), (d * k) + (e * n) + (f * q), (d * l) + (e * o) + (f * r)],
 			[(g * j) + (h * m) + (i * p), (g * k) + (h * n) + (i * q), (g * l) + (h * o) + (i * r)]
 		]
+
+def LeviCivita2(i, j):
+	if (i, j) == (1, 2):
+		return 1
+	if (i, j) == (2, 1):
+		return -1
+	return 0
+
+def LeviCivita3(i, j, k):
+	x = (i, j, k)
+	if x in [(1, 2, 3), (2, 3, 1), (3, 1, 2)]:
+		return 1
+	if x in [(3, 2, 1), (2, 1, 3), (1, 3, 2)]:
+		return -1
+	return 0
