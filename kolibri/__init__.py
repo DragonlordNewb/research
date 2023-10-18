@@ -6,4 +6,4 @@ from kolibri.utils import *
 
 import decimal
 
-decimal.getcontext().prec = 12
+decimal.getcontext().prec = 12 # set it to whatever you want

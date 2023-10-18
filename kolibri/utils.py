@@ -11,6 +11,9 @@ from decimal import Decimal
 
 import sys
 
+from abc import ABC
+from abc import abstractmethod
+
 Scalar = Union[int, float, Decimal]
 
 def sgn(x: Scalar) -> int:

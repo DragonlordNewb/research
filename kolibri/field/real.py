@@ -1,6 +1,7 @@
 from kolibri.field.engine import Field
 from kolibri.utils import *
 
+@Field.register("potentialwell")
 class PotentialWell(Field):
 
 	signature = set()

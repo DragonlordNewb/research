@@ -1,9 +1,19 @@
-from abc import ABC
-from abc import abstractmethod
-
 from kolibri.utils import *
 
 class Field(ABC):
+
+	REGISTRATIONS = {}
+
+	@classmethod
+	def register(cls, name: str) -> type:
+		def deco(ncls):
+			cls.REGISTRATIONS[name.lower()] = ncls
+			return ncls
+		return deco
+
+	@classmethod
+	def lookup(cls, name: str) -> type:
+		return cls.REGISTRATIONS[name.lower()]
 
 	signature: set[str]
 	

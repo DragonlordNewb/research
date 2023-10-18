@@ -29,6 +29,6 @@ print("Tracking particle location:")
 try:
 	while True:
 		st.tick(100)
-		print(p.location)
+		print(p.location, p.classif.experiencedSpace, p.classif.experiencedTime)
 except KeyboardInterrupt:
 	pass

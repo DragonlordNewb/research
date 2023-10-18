@@ -1,6 +1,3 @@
-from abc import abstractmethod
-from abc import ABC
-
 from kolibri.utils import *
 from kolibri.constants import *
 
@@ -65,6 +62,19 @@ class ClassificationTracker:
 		self.experiencedTime = self.experiencedSpace = self.properTime = self.properSpace = 0
 
 class Body(ABC):
+
+	REGISTRATIONS = {}
+
+	@classmethod
+	def register(cls, name: str) -> type:
+		def deco(ncls):
+			cls.REGISTRATIONS[name.lower()] = ncls
+			return ncls
+		return deco
+
+	@classmethod
+	def lookup(cls, name: str) -> type:
+		return cls.REGISTRATIONS[name.lower()]
 
 	def __init__(self, id: str, location: Vector, velocity: Vector=Vector(0, 0, 0), **charges: dict[str, Any]) -> None:
 		self.id = id
