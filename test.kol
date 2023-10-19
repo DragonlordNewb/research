@@ -1,5 +1,5 @@
-field + gravitywell { };
-body + particle p { energy=1 } at 1000 2000 3000;
+field + well { };
+body + particle p { energy=1 } at 0.1 0.2 0.3;
 metric set minkowski;
 
 body locate p;

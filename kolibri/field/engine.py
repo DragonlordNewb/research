@@ -26,7 +26,7 @@ class Field(ABC):
 		self.calculus = Calculus(h)
 
 	@abstractmethod
-	def potential(self, spacetime: "Spacetime", atom: Atom) -> Callable[[Vector], Scalar]:
+	def potential(self, spacetime: "Spacetime", location: Vector) -> Scalar:
 		pass
 
 	@abstractmethod

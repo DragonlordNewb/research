@@ -158,8 +158,8 @@ class Spacetime:
 			for body, atom in self.atoms:
 				for field in self.fields:
 					if field.signature.issubset(atom.signature):
-						force = self.calculus.gradient(field.potential(self, atom), atom.location) * -1
-						acceleration = force * field.coupling(atom)
+						force = self.calculus.gradient(lambda v: field.potential(self, v), atom.location) * -1 * self.resolution
+						acceleration = field.coupling(atom) * force / atom.mass
 						body.accelerate(acceleration * self.resolution)
 
 		for body in self.bodies:

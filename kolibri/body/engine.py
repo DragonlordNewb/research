@@ -12,6 +12,11 @@ class Atom:
 
 		self.signature = set(charges.keys())
 
+		if "mass" not in self.charges.keys():
+			self.charges["mass"] = self.charges["energy"] / c2
+
+		self.mass = self.charges["mass"]
+
 class ClassificationTracker:
 
 	BRADYONIC = "bradyonic"
