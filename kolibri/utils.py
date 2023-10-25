@@ -1,8 +1,20 @@
+# not even gonna try and put comments on this one
+#
+# so
+#
+# if it isn't intuitive from the get go, documentation
+# for kolibri.utils can be found in hell (ask Asmodeus 
+# first once you get there)
+
 from typing import Union
 from typing import Iterable
-from typing import Tuple
 from typing import Any
 from typing import Callable
+from typing import Tuple
+from abc import ABC
+from abc import abstractmethod
+from abc import abstractclassmethod
+from abc import abstractstaticmethod
 
 from math import sqrt
 from math import acos
@@ -10,18 +22,6 @@ from math import acos
 from decimal import Decimal
 
 import sys
-
-from abc import ABC
-from abc import abstractmethod
-
-Scalar = Union[int, float, Decimal]
-
-def sgn(x: Scalar) -> int:
-	if x > 0:
-		return 1
-	if x < 0:
-		return -1
-	return 0
 
 class ProgressBar:
 	def __init__(self, iterable, label: str="Processing: ", length=None, fillchar='#', width=100):
@@ -340,125 +340,3 @@ class Calculus:
 			return laplacianField
 			
 		return laplacianField(v)
-
-class SystemFailure(BaseException):
-	NONFATAL = "NONFATAL"
-	FATAL = "FATAL"
-
-	def __init__(self, fatality: str, error: str, description: str) -> None:
-		BaseException.__init__(self, error)
-		self.error = error
-		self.description = description
-		self.fatality = fatality
-
-	def panic(self) -> Exception:
-		print(self.fatality + " SYSTEM FAILURE: " + self.error)
-		print("\t" + self.description.replace("\n", "\t\n"))
-		if self.fatality == self.FATAL:
-			raise self
-
-# antired = cyan
-# antigreen = purple
-# antiblue = yellow
-
-_GellMann__isqrt3 = 1/sqrt(3)
-
-class GellMann:
-
-	MATRICES = {
-	# L_1: red and cyan
-	1: [
-		[0, 1, 0],
-		[1, 0, 0], 
-		[0, 0, 0]
-	],
-
-	# L_2: green and purple
-	2: [
-		[0,  -1j, 0],
-		[1j, 0,   0],
-		[0,  0,   0]
-	],
-
-	# L_3: blue and yellow
-	3: [
-		[1, 0,  0],
-		[0, -1, 0],
-		[0, 0,  0]
-	],
-
-	# L_4: red, cyan, green or red, cyan, purple
-	4: [
-		[0, 0, 1],
-		[0, 0, 0],
-		[1, 0, 0]
-	],
-
-	# L_5: red, cyan, blue red, cyan, yellow
-	5: [
-		[0,  0, -1j],
-		[0,  0, 0  ],
-		[1j, 0, 0  ]
-	],
-
-	# L_6: green, purple, blue or green, purple, yellow
-	6: [
-		[0, 0, 0],
-		[0, 0, 1],
-		[0, 1, 0]
-	],
-
-	# L_7: blue, yellow, red or blue, yellow, cyan
-	7: [
-		[0, 0,  0  ],
-		[0, 0,  -1j],
-		[0, 1j, 0  ]
-	],
-
-	# L_8: red, green, blue or cyan, purple, yellow
-	8: [
-		[__isqrt3, 0,        0            ],
-		[0,        __isqrt3, 0            ],
-		[0,        0,        -2 * __isqrt3]
-	]
-}
-
-	def __init__(self, index: int) -> None:
-		self.index = index
-		self.matrix = self.MATRICES[index] 
-
-	def __mul__(self, other: "GellMann") -> Scalar:
-		matrix1 = self.matrix
-		matrix2 = other.matrix
-		p1 = self.multiply3x3(matrix1, matrix2)
-		p2 = self.multiply3x3(matrix2, matrix1)
-		s = self.add3x3(p1, p2)
-
-	@staticmethod
-	def add3x3(matrix1: list[list[Scalar]], matrix2: list[list[Scalar]]) -> list[list[Scalar]]:
-		return [[matrix1[r][c] + matrix2[r][c] for c in range(3)] for r in range(3)]
-
-	@staticmethod
-	def multiply3x3(matrix1: list[list[Scalar]], matrix2: list[list[Scalar]]) -> list[list[Scalar]]:
-		((a, b, c), (d, e, f), (g, h, i)) = matrix1
-		((j, k, l), (m, n, o), (p, q, r)) = matrix2
-		return [
-			[(a * j) + (b * m) + (c * p), (a * k) + (b * n) + (c * q), (a * l) + (b * o) + (c * r)],
-			[(d * j) + (e * m) + (f * p), (d * k) + (e * n) + (f * q), (d * l) + (e * o) + (f * r)],
-			[(g * j) + (h * m) + (i * p), (g * k) + (h * n) + (i * q), (g * l) + (h * o) + (i * r)]
-		]
-
-def LeviCivita2(i, j):
-	if (i, j) == (1, 2):
-		return 1
-	if (i, j) == (2, 1):
-		return -1
-	return 0
-
-def LeviCivita3(i, j, k):
-	x = (i, j, k)
-	if x in [(1, 2, 3), (2, 3, 1), (3, 1, 2)]:
-		return 1
-	if x in [(3, 2, 1), (2, 1, 3), (1, 3, 2)]:
-		return -1
-	return 0
