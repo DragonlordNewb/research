@@ -95,6 +95,9 @@ class Metric(ABC):
 			raise RuntimeError("Can\'t compute timewarp without a Spacetime.")
 
 		return self._timewarp(self.spacetime, location)
+	
+	def warp(self, location: Vector) -> Scalar:
+		return self.spacewarp(location) / self.timewarp(location)
 
 # ===== Implementations ===== #
 

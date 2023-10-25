@@ -131,7 +131,7 @@ class Entity(ABC):
 			I += atom.mass * (r ** 2)
 		return Decimal(I)
 
-	def applyForce(self, f: Vector, location: Vector, apply: bool=True) -> tuple[Vector, Vector]:
+	def applyForce(self, f: Vector, location: Vector, timestep: Scalar, apply: bool=True) -> tuple[Vector, Vector]:
 		"""
 		Get the angular and linear accelerations given a force
 		applied at an offset from the center of mass.
