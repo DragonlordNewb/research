@@ -21,4 +21,7 @@ class Force(ABC):
 	Do not use.
 	"""
 
+	def __init__(self, **parameters):
+		self.parameters = parameters
+
 	
