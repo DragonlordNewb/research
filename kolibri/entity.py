@@ -21,6 +21,7 @@ class Entity(ABC):
 			self.location = location
 			self.mass = mass
 			self.charges = charges
+			self.signature = set(self.charges.keys())
 
 	def __init__(self, id: str, location: Vector, restMass: Scalar=1, **charges: dict[str, Any]) -> None:
 		self.id = id
@@ -108,7 +109,10 @@ class Entity(ABC):
 	@centerOfMass.getter
 	def centerOfMass(self) -> Vector:
 		atoms = self.atoms()
-		return sum([atom.location for atom in atoms]) / len(atoms)
+		loc = Vector(0, 0, 0)
+		for atom in atoms:
+			loc += atom.location
+		return loc / len(atoms)
 
 	@centerOfMass.setter
 	def centerOfMass(self, value: Any) -> Exception:
@@ -129,7 +133,7 @@ class Entity(ABC):
 		for atom in self.atoms():
 			r = abs(atom.location - com)
 			I += atom.mass * (r ** 2)
-		return Decimal(I)
+		return Decimal(I) if Decimal(I) != 0 else 1
 
 	def applyForce(self, f: Vector, location: Vector, timestep: Scalar, apply: bool=True) -> tuple[Vector, Vector]:
 		"""
@@ -151,3 +155,9 @@ class Entity(ABC):
 			self.rotation += deltaOmega
 
 		return deltaV, deltaOmega
+	
+# ===== Implementations ===== #
+
+class Particle(Entity):
+	def atoms(self) -> list[Entity.Atom]:
+		return [self.makeAtom(location=self.location, mass=self.mass, **self.charges)]

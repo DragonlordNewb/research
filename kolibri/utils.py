@@ -23,6 +23,8 @@ from decimal import Decimal
 
 import sys
 
+Scalar = Union[Decimal, int, float]
+
 class ProgressBar:
 	def __init__(self, iterable, label: str="Processing: ", length=None, fillchar='#', width=100):
 		self.iterable = iterable

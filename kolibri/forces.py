@@ -12,6 +12,11 @@ from kolibri.utils import *
 # by calculating the field potential at the location
 # of each of the n particles and using a gradient to
 # determine the direction and magnitude of the force.
+#
+# Really any fundamental force can be expressed with
+# either a Field or an Interaction but the classes I
+# wrote are a justifiable way to speed up the forces
+# insofar as making them easier to calculate.
 
 class Force(ABC):
 
@@ -55,4 +60,42 @@ class Field(Force):
 		pass
 	
 	def apply(self, atom: "Atom") -> tuple[Vector, Vector]:
+		if not self.signature.issubset(atom.signature):
+			return Vector(0, 0, 0), Vector(0, 0, 0)
 		return -self.calculus.gradient(self.potential) * self.coupling(atom)
+	
+class Interaction(Force):
+
+	signature: set[str]
+
+	@abstractmethod
+	def interaction(self, a: "Atom", b: "Atom"):
+		"""
+		Return the force applied to particle A by particle B.
+		"""
+		pass
+
+	def apply(self, atom: "Atom") -> tuple[Vector, Vector]:
+		if not self.signature.issubset(atom.signature):
+			return Vector(0, 0, 0), Vector(0, 0, 0)
+		
+		appliedForces = []
+		forceLocations = []
+
+		for otherAtom in self.spacetime.otherAtoms(atom):
+			if not self.signature.issubset(otherAtom.signature):
+				continue
+
+			appliedForces.append(self.interaction(atom, otherAtom))
+			forceLocation.append(otherAtom.location)
+
+		appliedForce = Vector(0, 0, 0)
+		location = Vector(0, 0, 0)
+
+		for v in appliedForces:
+			appliedForce += v
+		for v in forceLocations:
+			location += v
+		location /= len(forceLocations)
+
+		return appliedForce, location

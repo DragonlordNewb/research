@@ -129,7 +129,7 @@ class Schwarzschild(Metric):
 
 	@staticmethod
 	def schwarzschildSpaceFactor(m, r):
-		return Decimal(1 / schwarzschildTimeFactor(m, r))
+		return Decimal(1 / Schwarzschild.schwarzschildTimeFactor(m, r))
 
 	@staticmethod
 	def schwarzschildTimeFactor(m, r):
@@ -142,12 +142,12 @@ class Schwarzschild(Metric):
 	def _spacewarp(spacetime, location):
 		warp = 1
 		for atom in spacetime.atoms():
-			warp *= self.schwarzschildSpaceFactor(atom.mass, abs(atom.location - location))
+			warp *= Schwarzschild.schwarzschildSpaceFactor(atom.mass, abs(atom.location - location))
 		return warp
 
 	@staticmethod
 	def _timewarp(spacetime, location):
 		warp = 1
 		for atom in spacetime.atoms():
-			warp *= self.schwarzschildTimeFactor(atom.mass, abs(atom.location - location))
+			warp *= Schwarzschild.schwarzschildTimeFactor(atom.mass, abs(atom.location - location))
 		return warp
