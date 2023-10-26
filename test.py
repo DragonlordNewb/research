@@ -6,6 +6,6 @@ class x:
 			return f
 		return wrapper
 
-	@(deco("Hello"))
+	@
 	def go(self):
 		print("hi")
