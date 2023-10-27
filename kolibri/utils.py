@@ -335,7 +335,11 @@ class Vector:
 
 	@classmethod
 	def zero(cls, dimension: int) -> Union["Vec3", "Vec4"]:
-		return cls(*[0 for _ in range(dimension)])
+		if dimension == 4:
+			return Vec4(0, 0, 0, 0)
+		elif dimension == 3:
+			return Vec3(0, 0, 0)
+		raise IndexError("Bad number of dimensions.")
 
 Value = Union[Scalar, Vec3]
 

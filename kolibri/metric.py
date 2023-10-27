@@ -1,153 +1,116 @@
 from kolibri.utils import *
 from kolibri.constants import *
 
-# Define this as a sentinel in case something horribly wrong happens
-# and an object passes through an event horizon
-EVENT_HORIZON_CROSSED = "event horizon crossed"
+from functools import lru_cache
 
-class Metric(ABC):
+def const(value: Scalar) -> Callable[[Vec3, Vec4, "Spacetime"], Scalar]:
+	def _const(*args, **kwargs):
+		return value
+	return _const
 
-	"""
-	The Metric abstract base class represents a spacetime metric.
-	Two methods need be overridden: the static methods Metric._spacewarp
-	and Metric._timewarp. See the abstract methods below for more
-	information.
+ZERO = const(0)
+ONE = const(1)
 
-	Once these are overridden, methods like Metric.spacewarp,
-	Metric.timewarp, etc. work once the spacetime is set. The 
-	Metric has an @property specifically for this purpose.
-	"""
+class Metric:
 
-	@abstractstaticmethod
-	def _spacewarp(spacetime: "Spacetime", location: Vector) -> Scalar:
-		"""
-		Compute the factor by which space is expanded at a given
-		location in a given spacetime.
-
-		W_S > 1 => MORE space is experienced, rulers contract, velocity is lower
-		W_S < 1 => LESS space is experienced, rulers expand, velocity is higher
-		"""
-
-		pass
-
-	@abstractstaticmethod
-	def _timewarp(spacetime: "Spacetime", location: Vector) -> Scalar:
-		"""
-		Compute the factor by which time is dilated at a given
-		location in a given spacetime.
-
-		W_T > 1 => MORE time is experienced, clocks speed up, velocity is higher
-		W_T < 1 => LESS time is experienced, clocks slow down, velocity is lower
-		"""
-		
-		pass
+	tensor: list[list[Callable[[Vec3, Vec4, "Spacetime"], Scalar]]]
 
 	def __init__(self) -> None:
-		self._spacetime: "Spacetime" = None
+		self._spacetime = None
 
 	@property
-	def spacetime(self) -> None:
-		"""
-		Spacetime property.
-		"""
-
-		return
+	def spacetime(self) -> "Spacetime":
+		return self._spacetime
 	
 	@spacetime.getter
-	def spacetime(self) -> Union[None, "Spacetime"]:
-		"""
-		Get the Metric._spacetime attribute.
-		"""
-
+	def spacetime(self) -> "Spacetime":
 		return self._spacetime
-
+	
 	@spacetime.setter
-	def spacetime(self, spacetime: "Spacetime") -> None:
-		"""
-		Set the spacetime of the metric.
-		Equivalent to setting the metric of the spacetime.
-		"""
+	def spacetime(self, value: Union["Spacetime", None]) -> None:
+		self._spacetime == value
+		if value is not None:
+			self._spacetime._metric = self
 
-		self._spacetime = spacetime
-		if spacetime is not None:
-			self._spacetime._metric = self # probably won't cause issues
-
-	def spacewarp(self, location: Vector) -> Scalar:
-		"""
-		Compute the spacewarp factor at a given location.
-
-		Requires that the Spacetime be set.
-		"""	
+	def __getitem__(self, index: tuple[int, int]) -> Callable:
+		mu, nu = index
+		return self.tensor[nu][mu]
 	
-		if self.spacetime == None:
-			raise RuntimeError("Can\'t compute spacewarp without a Spacetime.")
+	def warp(self, l: Vec3, dX: Vec4) -> Vec4:
+		W = Vector.zero(4)
 
-		return self._spacewarp(self.spacetime, location)
+		for nu, column in enumerate(self.tensor):
+			for mu, component in enumerate(column):
+				f = component(l, dX, self.spacetime)
+				g = sqrt(f)
 
-	def timewarp(self, location: Vector) -> Scalar:
-		"""
-		Compute the timewarp factor at a given location.
+				if mu == nu:
+					W[mu] += g
+				else:
+					W[mu] += g
+					W[nu] += g
 
-		Requires that the Spacetime be set.
-		"""
-
-		if self.spacetime == None:
-			raise RuntimeError("Can\'t compute timewarp without a Spacetime.")
-
-		return self._timewarp(self.spacetime, location)
+		return Vec4(*[w * dx for w, dx in zip(W, dX)])
 	
-	def warp(self, location: Vector) -> Scalar:
-		return self.spacewarp(location) / self.timewarp(location)
-
 # ===== Implementations ===== #
 
 class Minkowski(Metric):
-
-	"""
-	Minkowski space: perfectly flat spacetime in which
-	no warps take effect.
-
-	ds^2 = -c^2dt^2 + dx^2 + dy^2 + dz^2
-	"""
-
-	@staticmethod
-	def _spacewarp(spacetime, location):
-		return 1
-
-	@staticmethod
-	def _timewarp(spacetime, location):
-		return 1
+	
+	tensor = [
+		[const(-c2), ZERO, ZERO, ZERO],
+		[ZERO,       ONE,  ZERO, ZERO],
+		[ZERO,       ZERO, ONE,  ZERO],
+		[ZERO,       ZERO, ZERO, ONE ]
+	]
 
 class Schwarzschild(Metric):
 
-	"""
-	Metric which accounts for mass but not electric charge
-	or rotation.
-
-	ds^2 = -(1 - 2Gm/rc^2)c^2dt^2 + (1 - 2Gm/rc^2)^-1 (dx^2 + dy^2 + dz^2)
-	"""
-
+	@lru_cache(maxsize=5)
 	@staticmethod
-	def schwarzschildSpaceFactor(m, r):
-		return Decimal(1 / Schwarzschild.schwarzschildTimeFactor(m, r))
-
-	@staticmethod
-	def schwarzschildTimeFactor(m, r):
-		try:
-			return Decimal(1 - (2 * G * m) / (r * c2))
-		except:
-			return EVENT_HORIZON_CROSSED
-
-	@staticmethod
-	def _spacewarp(spacetime, location):
-		warp = 1
+	def factor(l: Vec3, dX: Vec4, spacetime: "Spacetime") -> Scalar:
+		f = 1
 		for atom in spacetime.atoms():
-			warp *= Schwarzschild.schwarzschildSpaceFactor(atom.mass, abs(atom.location - location))
-		return warp
-
+			if atom.location == l:
+				continue
+			r = abs(l - atom.location)
+			f *= 1 - ((2 * G * atom.mass) / (r * c2))
+		return Decimal(f)
+	
+	@lru_cache(maxsize=5)
 	@staticmethod
-	def _timewarp(spacetime, location):
-		warp = 1
+	def invfactor(l, dX, spacetime):
+		return 1 / Schwarzschild.factor(l, dX, spacetime)
+	
+	tensor = [
+		[factor, ZERO,      ZERO,      ZERO     ],
+		[ZERO,   invfactor, ZERO,      ZERO     ],
+		[ZERO,   ZERO,      invfactor, ZERO     ],
+		[ZERO,   ZERO,      ZERO,      invfactor]
+	]
+
+class ReissnerNordstrom(Metric):
+	# Apologize for misspelling Nordstrom's name.
+	# The Python interpreter doesn't like Unicode.
+
+	@lru_cache(maxsize=5)
+	@staticmethod
+	def factor(l: Vec3, dX: Vec4, spacetime: "Spacetime") -> Scalar:
+		f = 1
 		for atom in spacetime.atoms():
-			warp *= Schwarzschild.schwarzschildTimeFactor(atom.mass, abs(atom.location - location))
-		return warp
+			if atom.location == l:
+				continue
+			r = abs(l - atom.location)
+			f *= (1 - ((2 * G * atom.mass) / (r * c2))) + (((atom.charge ** 2) * G) / (4 * pi * epsilon0 * c4 * (r ** 2)))
+		return Decimal(f)
+	
+	@lru_cache(maxsize=5)
+	@staticmethod
+	def invfactor(l, dX, spacetime):
+		return 1 / ReissnerNordstrom.factor(l, dX, spacetime)
+	
+	tensor = [
+		[factor, ZERO,      ZERO,      ZERO     ],
+		[ZERO,   invfactor, ZERO,      ZERO     ],
+		[ZERO,   ZERO,      invfactor, ZERO     ],
+		[ZERO,   ZERO,      ZERO,      invfactor]
+	]
