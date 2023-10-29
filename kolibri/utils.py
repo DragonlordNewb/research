@@ -1,11 +1,3 @@
-# not even gonna try and put comments on this one
-#
-# so
-#
-# if it isn't intuitive from the get go, documentation
-# for kolibri.utils can be found in hell (ask Asmodeus 
-# first once you get there)
-
 from typing import Union
 from typing import Iterable
 from typing import Any
