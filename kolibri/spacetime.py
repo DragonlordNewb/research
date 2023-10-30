@@ -62,3 +62,6 @@ class Spacetime:
 		for entity in self.entities:
 			for force in self.forces:
 				f, o = force.entityForce(entity)
+				a, omega = entity.calculateEffects(f, o)
+				entity.velocity += a * self.resolution
+				entity.spin += omega * self.resolution
