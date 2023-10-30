@@ -16,3 +16,14 @@ class Spacetime:
 	def __init__(self, resolution: Scalar=0.000001) -> None:
 		self.resolution = resolution
 		self.calculus = Calculus(resolution)
+		self.entities: list[Entity] = []
+		self.forces: list[Force] = []
+		self._metric: Metric = None
+		
+	@property
+	def metric(self) -> Metric:
+		return self._metric
+	@metric.getter
+	def metric(self) -> Metric:
+		return self._metric
+	
