@@ -60,4 +60,5 @@ class Spacetime:
 			for _ in ProgressBar(range(iterations)):
 				self.tick(1)
 		for entity in self.entities:
-			
+			for force in self.forces:
+				f, o = force.entityForce(entity)
