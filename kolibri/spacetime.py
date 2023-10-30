@@ -51,7 +51,13 @@ class Spacetime:
 			self.forces.append(item)
 			return
 		raise TypeError("Can\'t add whatever that is.")
+		
 	def __rrshift__(self, item) -> None:
 		return self << item
-	def tick(self, iterations: int=1) -> None:
 		
+	def tick(self, iterations: int=1) -> None:
+		if iterations > 1:
+			for _ in ProgressBar(range(iterations)):
+				self.tick(1)
+		for entity in self.entities:
+			
