@@ -1,3 +1,7 @@
+"""
+Utilities for vectors and the like.
+"""
+
 from typing import Union
 from typing import Iterable
 from typing import Any

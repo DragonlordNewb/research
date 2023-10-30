@@ -1,115 +1,158 @@
+"""
+Metric classes and implementations.
+
+Note that -+++ signature is used.
+"""
+
 from kolibri.utils import *
+from kolibri.constants import *
+from kolibri.entity import *
 
-from functools import lru_cache
+class Component(ABC):
 
-def const(value: Scalar) -> Callable[[Vec3, Vec4, "Spacetime"], Scalar]:
-	def _const(*args, **kwargs):
-		return value
-	return _const
+	"""
+	Simple class representative of metric tensor 
+	components.
+	"""
 
-ZERO = const(0)
-ONE = const(1)
+	CONSTANT: Scalar = None
+
+	def __call__(self, atom: Atom, displacement: Vec4, spacetime: "Spacetime") -> Scalar:
+		if hasattr(self, "axial"):
+			return self.axial(atom, displacement, spacetime)
+		return self.CONSTANT
+	
+	@classmethod
+	def constant(cls, value: Scalar) -> type:
+		"""
+		Generate a constant Component.
+		"""
+
+		class ConstantComponent(cls):
+
+			CONSTANT = Value
+
+		return ConstantComponent
+	
+ZERO = Component.constant(0)
+ONE = Component.constant(1)
 
 class Metric:
 
-	tensor: list[list[Callable[[Vec3, Vec4, "Spacetime"], Scalar]]]
+	"""
+	Singlehandedly represents a spacetime metric!
+	Subclasses need only provide the Metric.tensor
+	list of lists of callables, and the Metric will 
+	do the rest.
 
+	Each Callable must accept three arguments: a
+	Vec3, a Vec4, and a Spacetime in that order,
+	and should return a scalar. The arguments
+	respectively represent the object in question,
+	the particular displacement of the object 
+	in question, and lastly the spacetime in which 
+	the object is embedded. The return value is 
+	the given component of the metric tensor.
+	"""
+
+	tensor: list[list[Component]] = None
+	
 	def __init__(self) -> None:
-		self._spacetime = None
+		if self.tensor is None:
+			raise NotImplementedError("Can\'t use the Metric base class.")
+		
+		self._spacetime: "Spacetime" = None
 
-	@property
-	def spacetime(self) -> "Spacetime":
-		return self._spacetime
-	
-	@spacetime.getter
-	def spacetime(self) -> "Spacetime":
-		return self._spacetime
-	
-	@spacetime.setter
-	def spacetime(self, value: Union["Spacetime", None]) -> None:
-		self._spacetime == value
-		if value is not None:
-			self._spacetime._metric = self
+		self.OFF_DIAGONALS = False
 
-	def __getitem__(self, index: tuple[int, int]) -> Callable:
+		for mu in range(4):
+			for nu in range(4):
+				if mu == nu:
+					continue
+				
+				if self[mu, nu].CONSTANT not in [0, None]:
+					self.OFF_DIAGONALS = True
+					return
+
+	def __getitem__(self, index: tuple[int, int]) -> Component:
+		"""
+		Get components.
+
+		Row-major, by the way.
+		"""
+
 		mu, nu = index
 		return self.tensor[nu][mu]
+
+	@property
+	def spacetime(self) -> None:
+		"""
+		Spacetime property.
+		"""
+
+		return
 	
-	def warp(self, l: Vec3, dX: Vec4) -> Vec4:
-		W = Vector.zero(4)
+	@spacetime.getter
+	def spacetime(self) -> Union[None, "Spacetime"]:
+		return self._spacetime
 
-		for nu, column in enumerate(self.tensor):
-			for mu, component in enumerate(column):
-				f = component(l, dX, self.spacetime)
-				g = sqrt(f)
+	@spacetime.setter
+	def spacetime(self, spacetime: "Spacetime") -> None:
+		"""
+		Set the spacetime of the metric.
+		Equivalent to setting the metric of the spacetime.
+		"""
 
+		self._spacetime = spacetime
+		if spacetime is not None:
+			self._spacetime._metric = self # probably won't cause issues
+
+	def warp(self, atom: Atom, displacement: Vec4) -> Scalar:
+		"""
+		Calculate the four-warp vector for a given particle
+		with its displacement.
+		"""
+
+		w: Vec4 = Vector.zero(4)
+
+		if self.spacetime is None:
+			raise RuntimeError("Missing a Spacetime.")
+		
+		# Calculate and add uniaxial warps
+		for mu in range(4):
+			gmm = self[mu, mu](atom, displacement, self.spacetime)
+			w[mu] += sqrt(gmm)
+
+		if not self.OFF_DIAGONALS:
+			return w
+
+		# Calculate and add biaxial warps
+		for mu in range(4):
+			for nu in range(4):
 				if mu == nu:
-					W[mu] += g
-				else:
-					W[mu] += g
-					W[nu] += g
+					continue
+				
+				gmn = self[mu, nu](atom, displacement, self.spacetime)
+				gnm = self[nu, mu](atom, displacement, self.spacetime)
+				s = gmn + gnm
+				w[mu] += s / displacement[nu]
+				w[nu] += s / displacement[mu]
 
-		return Vec4(*[w * dx for w, dx in zip(W, dX)])
+		return w
 	
 # ===== Implementations ===== #
 
 class Minkowski(Metric):
-	
+
+	"""
+	Minkowski space: flat spacetime.
+	"""
+
+	g00 = Component.constant(-(c ** 2))
+
 	tensor = [
-		[const(-c2), ZERO, ZERO, ZERO],
-		[ZERO,       ONE,  ZERO, ZERO],
-		[ZERO,       ZERO, ONE,  ZERO],
-		[ZERO,       ZERO, ZERO, ONE ]
-	]
-
-class Schwarzschild(Metric):
-
-	@lru_cache(maxsize=5)
-	@staticmethod
-	def factor(l: Vec3, dX: Vec4, spacetime: "Spacetime") -> Scalar:
-		f = 1
-		for atom in spacetime.atoms():
-			if atom.location == l:
-				continue
-			r = abs(l - atom.location)
-			f *= 1 - ((2 * G * atom.mass) / (r * c2))
-		return Decimal(f)
-	
-	@lru_cache(maxsize=5)
-	@staticmethod
-	def invfactor(l, dX, spacetime):
-		return 1 / Schwarzschild.factor(l, dX, spacetime)
-	
-	tensor = [
-		[factor, ZERO,      ZERO,      ZERO     ],
-		[ZERO,   invfactor, ZERO,      ZERO     ],
-		[ZERO,   ZERO,      invfactor, ZERO     ],
-		[ZERO,   ZERO,      ZERO,      invfactor]
-	]
-
-class ReissnerNordstrom(Metric):
-	# Apologize for misspelling Nordstrom's name.
-	# The Python interpreter doesn't like Unicode.
-
-	@lru_cache(maxsize=5)
-	@staticmethod
-	def factor(l: Vec3, dX: Vec4, spacetime: "Spacetime") -> Scalar:
-		f = 1
-		for atom in spacetime.atoms():
-			if atom.location == l:
-				continue
-			r = abs(l - atom.location)
-			f *= (1 - ((2 * G * atom.mass) / (r * c2))) + (((atom.charge ** 2) * G) / (4 * pi * epsilon0 * c4 * (r ** 2)))
-		return Decimal(f)
-	
-	@lru_cache(maxsize=5)
-	@staticmethod
-	def invfactor(l, dX, spacetime):
-		return 1 / ReissnerNordstrom.factor(l, dX, spacetime)
-	
-	tensor = [
-		[factor, ZERO,      ZERO,      ZERO     ],
-		[ZERO,   invfactor, ZERO,      ZERO     ],
-		[ZERO,   ZERO,      invfactor, ZERO     ],
-		[ZERO,   ZERO,      ZERO,      invfactor]
+		[g00,  ZERO, ZERO, ZERO],
+		[ZERO, ONE,  ZERO, ZERO],
+		[ZERO, ZERO, ONE,  ZERO],
+		[ZERO, ZERO, ZERO, ONE ]
 	]
