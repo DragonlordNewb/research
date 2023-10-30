@@ -22,8 +22,19 @@ class Spacetime:
 		
 	@property
 	def metric(self) -> Metric:
+		"""
+		Metric property.
+		"""
+		
 		return self._metric
+		
 	@metric.getter
 	def metric(self) -> Metric:
 		return self._metric
+		
+	@metric.setter
+	def metric(self, value: Metric) -> None:
+		self._metric = value
+		if value is not None:
+			self._metric._spacetime = self # shouldn't cause issues
 	
