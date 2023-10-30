@@ -29,7 +29,7 @@ class Entity(ABC):
 		self.velocity = Vector.zero(3)
 		self.spin = Vector.zero(3)
 
-		self.restMass = mass
+		self.restMass = restMass
 		self.charges = charges
 
 	@abstractmethod
@@ -134,3 +134,12 @@ class Entity(ABC):
 		omega = tau / I
 
 		return a, omega
+	
+# ===== Implementations ===== #
+
+class Particle(Entity):
+	
+	POINT = True
+
+	def atoms(self) -> None:
+		return [Atom(self.location, self.mass, self.charges)]

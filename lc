@@ -1,0 +1,1 @@
+find ./kolibri -type f -exec cat {} + | wc -l

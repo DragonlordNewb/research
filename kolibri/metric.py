@@ -23,16 +23,16 @@ class Component(ABC):
 		return self.CONSTANT
 	
 	@classmethod
-	def constant(cls, value: Scalar) -> type:
+	def constant(cls, value: Scalar) -> "Component":
 		"""
 		Generate a constant Component.
 		"""
 
 		class ConstantComponent(cls):
 
-			CONSTANT = Value
+			CONSTANT = Decimal(value)
 
-		return ConstantComponent
+		return ConstantComponent()
 	
 ZERO = Component.constant(0)
 ONE = Component.constant(1)
@@ -121,7 +121,10 @@ class Metric:
 		# Calculate and add uniaxial warps
 		for mu in range(4):
 			gmm = self[mu, mu](atom, displacement, self.spacetime)
-			w[mu] += sqrt(gmm)
+			if mu == 0:
+				w[mu] += Decimal(sqrt(-gmm))
+				continue
+			w[mu] += Decimal(sqrt(gmm))
 
 		if not self.OFF_DIAGONALS:
 			return w
@@ -149,10 +152,11 @@ class Minkowski(Metric):
 	"""
 
 	g00 = Component.constant(-(c ** 2))
+	gii = Component.constant(1)
 
 	tensor = [
 		[g00,  ZERO, ZERO, ZERO],
-		[ZERO, ONE,  ZERO, ZERO],
-		[ZERO, ZERO, ONE,  ZERO],
-		[ZERO, ZERO, ZERO, ONE ]
+		[ZERO, gii,  ZERO, ZERO],
+		[ZERO, ZERO, gii,  ZERO],
+		[ZERO, ZERO, ZERO, gii ]
 	]

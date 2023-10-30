@@ -329,9 +329,12 @@ class Vector:
 		else:
 			Vec4.__init__(self, a, b, c, d)
 
-	@classmethod
-	def zero(cls, dimension: int) -> Union["Vec3", "Vec4"]:
-		return cls(*[0 for _ in range(dimension)])
+	@staticmethod
+	def zero(d: int) -> Union[Vec3, Vec4]:
+		if d == 3:
+			return Vec3(0, 0, 0)
+		elif d == 4:
+			return Vec4(0, 0, 0, 0)
 
 Value = Union[Scalar, Vec3]
 

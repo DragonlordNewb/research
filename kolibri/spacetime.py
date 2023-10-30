@@ -14,7 +14,7 @@ class Spacetime:
 	"""
 	
 	def __init__(self, resolution: Scalar=0.000001) -> None:
-		self.resolution = resolution
+		self.resolution = Decimal(resolution)
 		self.calculus = Calculus(resolution)
 		self.entities: list[Entity] = []
 		self.forces: list[Force] = []
@@ -59,18 +59,25 @@ class Spacetime:
 		if iterations > 1:
 			for _ in ProgressBar(range(iterations)):
 				self.tick(1)
+
 		for entity in self.entities:
-			dt = self.resolution
-			
+
+			ws = []
 			for atom in entity.atoms():
-				g00 = self.metric[0, 0]
-				w = g00(atom, entity.velocity * self.resolution, self)
-				dt += sqrt(w)
+				x, y, z = atom.location
+				ws.append(self.metric.warp(atom, Vec4(self.resolution, x, y, z)))
+			w = Vector.zero(4)
+			for _w in ws:
+				w += _w / len(ws)
 				
 			for force in self.forces:
 				f, o = force.entityForce(entity)
 				a, omega = entity.calculateEffects(f, o)
-				entity.velocity += a * dt
-				entity.spin += omega * dt
-				entity.location += entity.velocity * dt
-				entity.angle += entity.spin * dt
+
+				for mu in range(3):
+					entity.velocity[mu] += a[mu] * w[0] * w[mu + 1] * self.resolution / c
+					entity.spin[mu] += omega[mu] * w[0] * w[mu + 1] * self.resolution / c
+
+			for mu in range(3):
+				entity.location[mu] += entity.velocity[mu] * w[0] * w[mu + 1] * self.resolution / c
+				entity.angle[mu] += entity.spin[mu] * w[0] * w[mu + 1] * self.resolution / c
