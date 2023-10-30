@@ -37,4 +37,17 @@ class Spacetime:
 		self._metric = value
 		if value is not None:
 			self._metric._spacetime = self # shouldn't cause issues
-	
+
+	# Ease-of-access
+	def __lshift__(self, item) -> None:
+		t = type(item)
+		if issubclass(t, Metric):
+			self.metric = item
+			return
+		if issubclass(t, Entity):
+			self.entities.append(item)
+			return
+		if issubclass(t, Force):
+			self.forces.append(item)
+			return
+		raise TypeError("Can\'t add whatever that is.")
