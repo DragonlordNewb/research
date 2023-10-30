@@ -60,8 +60,17 @@ class Spacetime:
 			for _ in ProgressBar(range(iterations)):
 				self.tick(1)
 		for entity in self.entities:
+			dt = self.resolution
+			
+			for atom in entity.atoms():
+				g00 = self.metric[0, 0]
+				w = g00(atom, entity.velocity * self.resolution, self)
+				dt += sqrt(w)
+				
 			for force in self.forces:
 				f, o = force.entityForce(entity)
 				a, omega = entity.calculateEffects(f, o)
-				entity.velocity += a * self.resolution
-				entity.spin += omega * self.resolution
+				entity.velocity += a * dt
+				entity.spin += omega * dt
+				entity.location += entity.velocity * dt
+				entity.angle += entity.spin * dt
