@@ -69,18 +69,7 @@ class Kolishell:
 			case _:
 				print("Invalid or incomplete command:", cmd)
 
-	def trace(self, eid: str, ticks: int) -> None:
-		ent: entity.Entity = None
-		for possibleEntity in self.spacetime.entities:
-			if possibleEntity.id == eid:
-				ent = possibleEntity
-				break
-		if ent is None:
-			print("Error: no such entity.")
-			return 1
-		for _ in range(ticks):
-			print(eid, "- at", repr(eid.location), "with velocity", repr(eid.velocity))
-			self.spacetime.tick(1)
+	
 
 	def cli(self) -> None:
 		print(self.BANNER)

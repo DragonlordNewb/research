@@ -6,7 +6,7 @@ st << m
 
 p1 = entity.Particle("p1", Vec3(0, 0, 0), 1, electric=1)
 st << p1
-p2 = entity.Particle("p2", Vec3(1, 1, 1), 10 ** 23, electric=-1)
+p2 = entity.Particle("p2", Vec3(1, 1, 1), 1, electric=-1)
 p2.velocity += Vec3(1, 2, 3)
 st << p2
 
@@ -15,6 +15,4 @@ st << f
 
 print(m.warp(p1.atoms()[0], Vector.zero(4)))
 
-print(p1.location)
-st.tick(1000)
-print(p1.location)
+st.trace("p1", 1000000)
