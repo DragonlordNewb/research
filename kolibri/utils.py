@@ -500,3 +500,8 @@ class Calculus:
 			return laplacianField
 			
 		return laplacianField(v)
+	
+def clearLastN(n):
+	for _ in range(n):
+		sys.stdout.write('\033[F')
+		sys.stdout.write('\033[K')
