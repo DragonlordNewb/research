@@ -100,7 +100,7 @@ class Spacetime:
 	def trace(self, ticks: int, *eids: str) -> None:
 		ents: list[entity.Entity] = []
 		for possibleEntity in self.entities:
-			if possibleEntity.name == eid:
+			if possibleEntity.name in eids:
 				ents.append(possibleEntity)
 				break
 		for _ in range(ticks):
