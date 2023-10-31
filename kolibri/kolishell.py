@@ -28,7 +28,7 @@ class Kolishell:
 					for key in metric.Metric.REGISTRATIONS.keys():
 						print(" -", key)
 					print("Done.")
-				elif datatype in ("f", "force"):
+				elif datatype in ("f", "i", "force", "forces", "field", "interaction", "fields", "interactions"):
 					print("Fetching available interactions and fields ...")
 					for key in force.Force.REGISTRATIONS.keys():
 						print(" -", key)
