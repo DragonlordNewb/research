@@ -97,16 +97,14 @@ class Spacetime:
 				entity.location[mu] += entity.velocity[mu] * w[0] * w[mu + 1] * self.resolution / c
 				entity.angle[mu] += entity.spin[mu] * w[0] * w[mu + 1] * self.resolution / c
 
-	def trace(self, eid: str, ticks: int) -> None:
-		ent: entity.Entity = None
+	def trace(self, ticks: int, *eids: str) -> None:
+		ents: list[entity.Entity] = []
 		for possibleEntity in self.entities:
 			if possibleEntity.name == eid:
-				ent = possibleEntity
+				ents.append(possibleEntity)
 				break
-		if ent is None:
-			print("Error: no such entity.")
-			return 1
 		for _ in range(ticks):
-			print("\r" + eid, "- at", repr(ent.location), "with velocity", repr(ent.velocity), end="                     ")
+			for ent in ents:
+				print("\r" + ent.name, "- at", repr(ent.location), "with velocity", repr(ent.velocity), end="                     ")
 			self.tick(1)
 		print("")
