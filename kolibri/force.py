@@ -9,11 +9,31 @@ class Force(ABC):
 	Should not be used.
 	"""
 
+	# Registration stuff
+
+	REGISTRATIONS = {}
+	@classmethod
+	def register(cls, name: str) -> Callable[[type], type]:
+		def deco(ncls):
+			cls.REGISTRATIONS[name.lower()] = ncls
+			return ncls
+		return deco
+	@classmethod
+	def getType(cls, name: str) -> type:
+		return cls.REGISTRATIONS[name.lower()]
+
+	# Actual stuff
+
 	def __init__(self, **variables: dict[str, Scalar]) -> None:
 		for key in variables.keys():
 			setattr(self, key, variables[key])
 
 		self._spacetime: "Spacetime" = None
+
+		self.__post_init__()
+
+	def __post_init__(self) -> None:
+		self.calculus = Calculus(h)
 
 	@property
 	def spacetime(self) -> None:
@@ -35,8 +55,6 @@ class Force(ABC):
 		"""
 
 		self._spacetime = spacetime
-		if spacetime is not None:
-			self._spacetime._metric = self # probably won't cause issues
 
 	@abstractmethod
 	def atomicForce(self, atom: Atom) -> Vec3:
@@ -84,11 +102,12 @@ class Field(Force):
 
 	h: Scalar = 0.000001
 
-	def __post_init__(self) -> None:
-		self.calculus = Calculus(h)
-
 	@abstractmethod
 	def potential(self, atom: Atom, location: Vec3) -> Scalar:
+		pass
+
+	@abstractmethod
+	def coupling(self, atom: Atom) -> Scalar:
 		pass
 	
 	def V(self, atom: Atom) -> Callable[[Vec3], Scalar]:
@@ -97,7 +116,9 @@ class Field(Force):
 		return potential
 	
 	def atomicForce(self, atom: Atom) -> Vec3:
-		return -1 * self.calculus.gradient(self.V(atom), atom.location) * self.coupling(atom)
+		grad = self.calculus.gradient(self.V(atom), atom.location)
+		coupling = self.coupling(atom)
+		return -coupling * grad
 	
 class Interaction(Force):
 
@@ -115,5 +136,44 @@ class Interaction(Force):
 		f = Vector.zero(3)
 		for otherAtom in self.spacetime.otherAtoms(atom):
 			dr = (otherAtom.location - atom.location).normal()
-			f += dr * self.interact(self, otherAtom)
+			interaction = self.interact(atom, otherAtom)
+			f += dr * interaction
 		return f
+	
+# ===== Implementations ===== #
+
+@Force.register("ElectromagneticF")
+class ElectromagneticField(Field):
+	"""
+	Electromagnetic field!
+	"""
+
+	def potential(self, atom, location):
+		p = 0
+		for otherAtom in self.spacetime.otherAtoms(atom):
+			if "electric" not in otherAtom.charges.keys():
+				continue
+			p += ke * otherAtom.charges["electric"] / abs(otherAtom.location - location)
+		return p
+	
+	def coupling(self, atom: Atom):
+		if "electric" not in atom.charges.keys():
+			return 0
+		return atom.charges["electric"]
+	
+@Force.register("ElectromagneticI")
+class ElectromagneticInteraction(Interaction):
+
+	"""
+	Electromagnetic interaction!
+	"""
+
+	def interact(self, a, b):
+		if not ("electric" in a.charges.keys() and "electric" in b.charges.keys()):
+			return 0
+		return -(b.charges["electric"] * ke) / self.spacetime.metric.distance(a, a.location, b.location)
+	
+	def coupling(self, atom):
+		if "electric" not in atom.charges.keys():
+			return 0
+		return atom.charges["electric"]

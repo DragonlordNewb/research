@@ -6,9 +6,16 @@ from dataclasses import dataclass
 @dataclass
 class Atom:
 	
+	parent: "Entity"
+	id: str
 	location: Vec3
 	mass: Scalar
 	charges: dict[str, Scalar]
+
+	def __eq__(self, other: "Atom"):
+		if type(self) != type(other):
+			return False
+		return self.id == other.id
 
 class Entity(ABC):
 
@@ -21,15 +28,31 @@ class Entity(ABC):
 	as a whole.
 	"""
 
+	# Registration stuff
+
+	REGISTRATIONS = {}
+	@classmethod
+	def register(cls, name: str) -> Callable[[type], type]:
+		def deco(ncls):
+			cls.REGISTRATIONS[name.lower()] = ncls
+			return ncls
+		return deco
+	@classmethod
+	def getType(cls, name: str) -> type:
+		return cls.REGISTRATIONS[name.lower()]
+
+	# Actual stuff
+
 	POINT: bool
 
-	def __init__(self, location: Vec3, restMass: Scalar, **charges: dict[str, Scalar]) -> None:
+	def __init__(self, name: str, location: Vec3, restMass: Scalar, **charges: dict[str, Scalar]) -> None:
+		self.name = name
 		self.location = location
 		self.angle = Vector.zero(3)
 		self.velocity = Vector.zero(3)
 		self.spin = Vector.zero(3)
 
-		self.restMass = restMass
+		self.restMass = Decimal(restMass)
 		self.charges = charges
 
 	@abstractmethod
@@ -81,7 +104,7 @@ class Entity(ABC):
 		return I
 	
 	def gamma(self) -> Scalar:
-		return 1 / sqrt(1 - ((abs(self.velocity) ** 2) / c2))
+		return Decimal(1 / sqrt(1 - ((abs(self.velocity) ** 2) / c2)))
 	
 	@property
 	def mass(self) -> Scalar:
@@ -137,9 +160,10 @@ class Entity(ABC):
 	
 # ===== Implementations ===== #
 
+@Entity.register("Particle")
 class Particle(Entity):
 	
 	POINT = True
 
 	def atoms(self) -> None:
-		return [Atom(self.location, self.mass, self.charges)]
+		return [Atom(self, self.name, self.location, self.mass, self.charges)]

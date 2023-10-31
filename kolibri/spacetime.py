@@ -39,6 +39,18 @@ class Spacetime:
 			self._metric._spacetime = self # shouldn't cause issues
 
 	# Ease-of-access
+
+	def atoms(self) -> Iterable[Atom]:
+		for entity in self.entities:
+			for atom in entity.atoms():
+				yield atom
+
+	def otherAtoms(self, atom: Atom) -> Iterable[Atom]:
+		for otherAtom in self.atoms():
+			if otherAtom == atom:
+				continue
+			yield otherAtom
+
 	def __lshift__(self, item) -> None:
 		t = type(item)
 		if issubclass(t, Metric):
@@ -49,6 +61,7 @@ class Spacetime:
 			return
 		if issubclass(t, Force):
 			self.forces.append(item)
+			item.spacetime = self
 			return
 		raise TypeError("Can\'t add whatever that is.")
 		
@@ -59,6 +72,7 @@ class Spacetime:
 		if iterations > 1:
 			for _ in ProgressBar(range(iterations)):
 				self.tick(1)
+			return
 
 		for entity in self.entities:
 
@@ -79,5 +93,6 @@ class Spacetime:
 					entity.spin[mu] += omega[mu] * w[0] * w[mu + 1] * self.resolution / c
 
 			for mu in range(3):
+
 				entity.location[mu] += entity.velocity[mu] * w[0] * w[mu + 1] * self.resolution / c
 				entity.angle[mu] += entity.spin[mu] * w[0] * w[mu + 1] * self.resolution / c

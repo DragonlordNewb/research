@@ -55,9 +55,24 @@ class Metric:
 	the given component of the metric tensor.
 	"""
 
+	# Registration stuff
+
+	REGISTRATIONS = {}
+	@classmethod
+	def register(cls, name: str) -> Callable[[type], type]:
+		def deco(ncls):
+			cls.REGISTRATIONS[name.lower()] = ncls
+			return ncls
+		return deco
+	@classmethod
+	def getType(cls, name: str) -> type:
+		return cls.REGISTRATIONS[name.lower()]
+
+	# Actual stuff
+
 	tensor: list[list[Component]] = None
 	
-	def __init__(self) -> None:
+	def __init__(self, h: Scalar=0.001) -> None:
 		if self.tensor is None:
 			raise NotImplementedError("Can\'t use the Metric base class.")
 		
@@ -73,6 +88,8 @@ class Metric:
 				if self[mu, nu].CONSTANT not in [0, None]:
 					self.OFF_DIAGONALS = True
 					return
+				
+		self.calculus = Calculus(h)
 
 	def __getitem__(self, index: tuple[int, int]) -> Component:
 		"""
@@ -143,8 +160,17 @@ class Metric:
 
 		return w
 	
+	def distance(self, atom: Atom, a: Vec3, b: Vec3) -> Scalar:
+		d = b - a
+		dx = d.x
+		dy = d.y
+		dz = d.z
+		w = self.warp(atom, d)
+		return abs(Vec3(dx * w.x, dy * w.y, dz * w.z))
+	
 # ===== Implementations ===== #
 
+@Metric.register("Minkowski")
 class Minkowski(Metric):
 
 	"""
@@ -159,4 +185,32 @@ class Minkowski(Metric):
 		[ZERO, gii,  ZERO, ZERO],
 		[ZERO, ZERO, gii,  ZERO],
 		[ZERO, ZERO, ZERO, gii ]
+	]
+
+@Metric.register("Schwarzschild")
+class Schwarzschild(Metric):
+
+	"""
+	Schwarzschild metric: accounts for mass.
+	"""
+
+	class Schwarzschild00(Component):
+		def axial(self, atom, displacement, spacetime):
+			w = 1
+			for otherAtom in spacetime.otherAtoms(atom):
+				w *= -1 * (1 - ((2 * G * otherAtom.mass) / (abs(otherAtom.location - atom.location) * c2)))
+			return w
+		
+	class SchwarzschildSS(Component):
+		def axial(self, atom, displacement, spacetime):
+			w = 1
+			for otherAtom in spacetime.otherAtoms(atom):
+				w *= 1 / (1 - ((2 * G * otherAtom.mass) / (abs(otherAtom.location - atom.location) * c2)))
+			return w
+		
+	tensor = [
+		[Schwarzschild00(), ZERO,              ZERO,              ZERO             ],
+		[ZERO,              SchwarzschildSS(), ZERO,              ZERO             ],
+		[ZERO,              ZERO,              SchwarzschildSS(), ZERO             ],
+		[ZERO,              ZERO,              ZERO,              SchwarzschildSS()]
 	]
