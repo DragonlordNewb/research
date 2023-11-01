@@ -1,13 +1,14 @@
-from sys import argv
-from kolibri import constants
 from kolibri import entity
 from kolibri import force
 from kolibri import metric
 from kolibri import spacetime
-from kolibri import utils
 from kolibri.utils import *
 
 class Kolishell:
+
+	"""
+	Simple command interpreter for Kolibri.
+	"""
 
 	BANNER = "Welcome to the Kolibri shell.\nType any command to continue."
 	PREFIX = " > "
@@ -69,7 +70,6 @@ class Kolishell:
 			case _:
 				print("Invalid or incomplete command:", cmd)
 
-	
 
 	def cli(self) -> None:
 		print(self.BANNER)

@@ -1,3 +1,7 @@
+"""
+A few mathematical and physical constants as Decimals.
+"""
+
 from math import pi
 from decimal import Decimal
 

@@ -112,6 +112,7 @@ class Spacetime:
 		for i in range(ticks):
 			print(
 				"\r" + eid, "- at", repr(ent.location), "with velocity", repr(ent.velocity), 
-				end=f" ({(i / ticks) * 100:.1f}%)" + (" " * 10))
+				end=f" ({(i / ticks) * 100:.1f}%)" + (" " * 10)
+			)
 			self.tick(1)
 		print("")

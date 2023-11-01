@@ -21,6 +21,13 @@ import sys
 
 Scalar = Union[Decimal, int, float]
 
+def sgn(x: Scalar) -> int:
+	if x > 0:
+		return Decimal(1)
+	if x < 0:
+		return Decimal(-1)
+	return Decimal(0)
+
 class ProgressBar:
 	def __init__(self, iterable, label: str="Processing: ", length=None, fillchar='#', width=100):
 		self.iterable = iterable

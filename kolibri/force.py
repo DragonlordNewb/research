@@ -1,3 +1,13 @@
+"""
+Module for base classes for forces and interactions.
+
+Note that, strictly speaking, any interaction can be 
+modelled as a force and any force can be modelled as an
+interaction. The two different base classes just differ
+in how they calculate the force on a particle. Otherwise
+they're identical and can be used interchangeably.
+"""
+
 from kolibri.utils import *
 from kolibri.constants import *
 from kolibri.entity import *
@@ -171,9 +181,19 @@ class ElectromagneticInteraction(Interaction):
 	def interact(self, a, b):
 		if not ("electric" in a.charges.keys() and "electric" in b.charges.keys()):
 			return 0
-		return -(b.charges["electric"] * ke) / self.spacetime.metric.distance(a, a.location, b.location)
+		return -(b.charges["electric"] * ke) * sgn(a.charges["electric"]) / self.spacetime.metric.distance(a, a.location, b.location)
 	
 	def coupling(self, atom):
 		if "electric" not in atom.charges.keys():
 			return 0
 		return atom.charges["electric"]
+	
+@Force.register("GravitationalI")
+class GravitationalInteraction(Interaction):
+
+	"""
+	Gravitational interaction!
+	"""
+
+	def interact(self, a, b):
+		pass
