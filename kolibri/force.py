@@ -196,4 +196,7 @@ class GravitationalInteraction(Interaction):
 	"""
 
 	def interact(self, a, b):
-		pass
+		return -1 * a.mass * b.mass / self.spacetime.metric.distance(a, a.location, b.location)
+	
+	def coupling(self, atom):
+		return G
