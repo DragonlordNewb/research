@@ -6,6 +6,7 @@ st << m
 
 p1 = entity.Particle("p1", Vec3(0, 0, 0), 1, electric=1e-12)
 st << p1
+p1.velocity += Vec3(-1, 2, 3)
 p2 = entity.Particle("p2", Vec3(1, 1, 1), 1, electric=-1e-12)
 p2.velocity += Vec3(1, 2, 3)
 st << p2
