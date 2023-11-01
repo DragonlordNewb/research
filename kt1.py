@@ -16,4 +16,4 @@ st << f
 
 print(m.warp(p1.atoms()[0], Vector.zero(4)))
 
-st.trace("p1", 1000000)
+st.trace("p1", 10000000)
