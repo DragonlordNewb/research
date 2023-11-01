@@ -1,12 +1,12 @@
 from kolibri import *
 
-st = spacetime.Spacetime()
+st = spacetime.Spacetime(0.000001)
 m = metric.Schwarzschild()
 st << m
 
-p1 = entity.Particle("p1", Vec3(0, 0, 0), 1, electric=1)
+p1 = entity.Particle("p1", Vec3(0, 0, 0), 1, electric=1e-12)
 st << p1
-p2 = entity.Particle("p2", Vec3(1, 1, 1), 1, electric=-1)
+p2 = entity.Particle("p2", Vec3(1, 1, 1), 1, electric=-1e-12)
 p2.velocity += Vec3(1, 2, 3)
 st << p2
 

@@ -7,6 +7,9 @@ from kolibri.entity import *
 from kolibri.force import *
 from kolibri.metric import *
 
+import decimal
+decimal.getcontext().prec = 12
+
 class Spacetime:
 
 	"""
@@ -89,16 +92,16 @@ class Spacetime:
 				a, omega = entity.calculateEffects(f, o)
 
 				for mu in range(3):
-					entity.velocity[mu] += a[mu] * w[0] * w[mu + 1] * self.resolution / c
-					entity.spin[mu] += omega[mu] * w[0] * w[mu + 1] * self.resolution / c
+					entity.velocity[mu] += a[mu] * w[0] * w[mu + 1] * self.resolution
+					entity.spin[mu] += omega[mu] * w[0] * w[mu + 1] * self.resolution
 
 			for mu in range(3):
 
-				entity.location[mu] += entity.velocity[mu] * w[0] * w[mu + 1] * self.resolution / c
-				entity.angle[mu] += entity.spin[mu] * w[0] * w[mu + 1] * self.resolution / c
+				entity.location[mu] += entity.velocity[mu] * w[0] * w[mu + 1] * self.resolution
+				entity.angle[mu] += entity.spin[mu] * w[0] * w[mu + 1] * self.resolution
 
 	def trace(self, eid: str, ticks: int) -> None:
-		ent: entity.Entity = None
+		ent: Entity = None
 		for possibleEntity in self.entities:
 			if possibleEntity.name == eid:
 				ent = possibleEntity
@@ -106,7 +109,9 @@ class Spacetime:
 		if ent is None:
 			print("Error: no such entity.")
 			return 1
-		for _ in range(ticks):
-			print("\r" + eid, "- at", repr(ent.location), "with velocity", repr(ent.velocity), end="                     ")
+		for i in range(ticks):
+			print(
+				"\r" + eid, "- at", repr(ent.location), "with velocity", repr(ent.velocity), 
+				end=f" ({(i / ticks) * 100:.1f}%)" + (" " * 10))
 			self.tick(1)
 		print("")

@@ -53,7 +53,7 @@ class Entity(ABC):
 		self.spin = Vector.zero(3)
 
 		self.restMass = Decimal(restMass)
-		self.charges = charges
+		self.charges = {key: Decimal(charges[key]) for key in charges.keys()}
 
 	@abstractmethod
 	def atoms(self) -> list[Atom]:
