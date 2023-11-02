@@ -347,7 +347,7 @@ Value = Union[Scalar, Vec3]
 
 class Calculus:
 
-	def __init__(self, h: Scalar=Decimal(0.000001)) -> None:
+	def __init__(self, h: Scalar=Decimal(0.001)) -> None:
 		self.h = Decimal(h)
 
 		self.dx = Vec3(self.h, 0, 0)

@@ -17,6 +17,10 @@ class Component(ABC):
 
 	CONSTANT: Scalar = None
 
+	def __init__(self, **kwargs) -> None:
+		for key in kwargs.keys():
+			setattr(self, key, kwargs[key])
+
 	def __call__(self, atom: Atom, displacement: Vec4, spacetime: "Spacetime") -> Scalar:
 		if hasattr(self, "axial"):
 			return self.axial(atom, displacement, spacetime)
@@ -213,4 +217,54 @@ class Schwarzschild(Metric):
 		[ZERO,              SchwarzschildSS(), ZERO,              ZERO             ],
 		[ZERO,              ZERO,              SchwarzschildSS(), ZERO             ],
 		[ZERO,              ZERO,              ZERO,              SchwarzschildSS()]
+	]
+
+@Metric.register("Reissner-Nordstrom")
+class ReissnerNordstrom(Metric):
+
+	"""
+	Reissner-Nordstrom metric!
+	"""
+
+	class ReissnerNordstrom00(Component):
+		def axial(self, atom, displacement, spacetime):
+			w = 1
+			for otherAtom in spacetime.otherAtoms(atom):
+				rc2 = abs(otherAtom.location - atom.location) * c2
+				w *= -1 * (1 - ((2 * G * otherAtom.mass) / rc2) + ((otherAtom.charges["electric"] ** 2) * G / (4 * pi * epsilon0 * (rc2 ** 2))))
+			return w
+		
+	class ReissnerNordstromSS(Component):
+		def axial(self, atom, displacement, spacetime):
+			w = 1
+			for otherAtom in spacetime.otherAtoms(atom):
+				w *= 1 / (1 - ((2 * G * otherAtom.mass) / rc2) + ((otherAtom.charges["electric"] ** 2) * G / (4 * pi * epsilon0 * (rc2 ** 2))))
+			return w
+		
+	tensor = [
+		[ReissnerNordstrom00(), ZERO,                  ZERO,                  ZERO                 ],
+		[ZERO,                  ReissnerNordstromSS(), ZERO,                  ZERO                 ],
+		[ZERO,                  ZERO,                  ReissnerNordstromSS(), ZERO                 ],
+		[ZERO,                  ZERO,                  ZERO,                  ReissnerNordstromSS()]
+	]
+		
+@Metric.register("Einstein-Thirring-Lense")
+class EinsteinThirringLense(Metric):
+	
+	class ETL(Component):
+		def axial(self, atom, displacement, spacetime):
+			w = 1
+			for otherAtom in spacetime.otherAtoms(atom):
+				c2r3 = (c ** 2) * (abs(atom.location - otherAtom.location) ** 3)
+				w *= self.sgn * 4 * G * (otherAtom.spin * otherAtom.mass)[self.mu] * (atom.location - otherAtom.location)[self.nu] / c2r3
+			return w
+
+	tensor = [
+		[Schwarzschild.Schwarzschild00(), ETL(mu=2, nu=3, sgn=-1),         ETL(mu=1, nu=3, sgn=-1),         ETL(mu=1, nu=2, sgn=-1)        ],
+
+		[ETL(mu=3, nu=2, sgn=1),          Schwarzschild.SchwarzschildSS(), ZERO,                            ZERO                           ],
+
+		[ETL(mu=3, nu=1, sgn=1),          ZERO,                            Schwarzschild.SchwarzschildSS(), ZERO                           ],
+		
+		[ETL(mu=2, nu=1, sgn=1),          ZERO,                            ZERO,                            Schwarzschild.SchwarzschildSS()]
 	]

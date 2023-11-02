@@ -9,6 +9,8 @@ class Atom:
 	parent: "Entity"
 	id: str
 	location: Vec3
+	velocity: Vec3
+	spin: Vec3
 	mass: Scalar
 	charges: dict[str, Scalar]
 
@@ -166,4 +168,4 @@ class Particle(Entity):
 	POINT = True
 
 	def atoms(self) -> None:
-		return [Atom(self, self.name, self.location, self.mass, self.charges)]
+		return [Atom(self, self.name, self.location, self.velocity, self.spin, self.mass, self.charges)]

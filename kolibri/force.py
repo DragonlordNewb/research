@@ -43,7 +43,7 @@ class Force(ABC):
 		self.__post_init__()
 
 	def __post_init__(self) -> None:
-		self.calculus = Calculus(h)
+		self.calculus = Calculus(h=0.001)
 
 	@property
 	def spacetime(self) -> None:
@@ -121,12 +121,13 @@ class Field(Force):
 		pass
 	
 	def V(self, atom: Atom) -> Callable[[Vec3], Scalar]:
-		def potential(location):
+		def pot(location):
 			return self.potential(atom, location)
-		return potential
+		return pot
 	
 	def atomicForce(self, atom: Atom) -> Vec3:
-		grad = self.calculus.gradient(self.V(atom), atom.location)
+		V = self.V(atom)
+		grad = self.calculus.gradient(V, atom.location)
 		coupling = self.coupling(atom)
 		return -coupling * grad
 	
@@ -167,8 +168,6 @@ class ElectromagneticField(Field):
 		return p
 	
 	def coupling(self, atom: Atom):
-		if "electric" not in atom.charges.keys():
-			return 0
 		return atom.charges["electric"]
 	
 @Force.register("ElectromagneticI")
