@@ -4,11 +4,12 @@ st = spacetime.Spacetime(0.000001)
 m = metric.Schwarzschild()
 st << m
 
-p1 = entity.Particle("p1", Vec3(0, 0, 0), 1, electric=1e-9)
+p1 = entity.Particle("p1", Vec3(0, 0, 0), 1, electric=1e-8)
 st << p1
 p2 = entity.Particle("p2", Vec3(1, 1, 1), 1, electric=-1e-8)
 st << p2
-p3 = entity.Particle("p3", Vec3(-1, 2, 0), 1, electric=1e-9)
+p3 = entity.Particle("p3", Vec3(-1, 2, 0), 1, electric=1e-6)
+st << p3
 
 f = force.ElectromagneticField()
 st << f

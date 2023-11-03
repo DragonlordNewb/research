@@ -12,6 +12,8 @@ from abc import abstractmethod
 from abc import abstractclassmethod
 from abc import abstractstaticmethod
 
+from time import time as currentEpoch
+
 from math import sqrt
 from math import acos
 
@@ -512,3 +514,10 @@ def clearLastN(n):
 	for _ in range(n):
 		sys.stdout.write('\033[F')
 		sys.stdout.write('\033[K')
+
+def stringifyTime(t):
+	if t < 60:
+		return f"{t:.1f} s"
+	if t < 3600:
+		return f"{round(t / 60)} m {t % 60:.1f} s"
+	return f"{round(t / 3600)} h {round(t / 60) % 60} m {t % 60:.1f} s"

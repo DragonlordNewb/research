@@ -22,6 +22,7 @@ class Spacetime:
 		self.entities: list[Entity] = []
 		self.forces: list[Force] = []
 		self._metric: Metric = None
+		self.properTime = Decimal(0)
 		
 	@property
 	def metric(self) -> Metric:
@@ -73,9 +74,14 @@ class Spacetime:
 		
 	def tick(self, iterations: int=1) -> None:
 		if iterations > 1:
+			st = currentEpoch()
 			for _ in ProgressBar(range(iterations)):
 				self.tick(1)
+			et = currentEpoch()
+			print("\nFinished in " + str(et - st) + " seconds.")
 			return
+		
+		self.properTime += self.resolution
 
 		for entity in self.entities:
 
@@ -109,9 +115,11 @@ class Spacetime:
 		if ent is None:
 			print("Error: no such entity.")
 			return 1
+		st = currentEpoch()
 		for i in range(ticks):
+			ct = currentEpoch()
 			print(
-				"\r" + eid, "- at", repr(ent.location), "with velocity", repr(ent.velocity), 
+				"\relapsed time: " + stringifyTime(ct - st) + ", proper time: " + str(self.properTime) + " s - " + eid, "at", repr(ent.location), "with velocity", repr(ent.velocity), 
 				end=f" ({(i / ticks) * 100:.1f}%)" + (" " * 10)
 			)
 			self.tick(1)

@@ -143,7 +143,7 @@ class Metric:
 		for mu in range(4):
 			gmm = self[mu, mu](atom, displacement, self.spacetime)
 			if mu == 0:
-				w[mu] += Decimal(sqrt(-gmm))
+				w[mu] += Decimal(sqrt(abs(gmm)))
 				continue
 			w[mu] += Decimal(sqrt(gmm))
 
