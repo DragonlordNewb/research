@@ -13,4 +13,4 @@ st << p2
 f = force.ElectromagneticField()
 st << f
 
-st.trace("p1", 100000)
+st.trace("p1", 10000000)
