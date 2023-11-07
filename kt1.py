@@ -1,6 +1,6 @@
 from kolibri import *
 
-st = spacetime.Spacetime(0.000001)
+st = spacetime.Spacetime(0.001)
 m = metric.Schwarzschild()
 st << m
 
