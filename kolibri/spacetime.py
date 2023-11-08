@@ -105,6 +105,8 @@ class Spacetime:
 
 				entity.location[mu] += entity.velocity[mu] * w[0] * w[mu + 1] * self.resolution
 				entity.angle[mu] += entity.spin[mu] * w[0] * w[mu + 1] * self.resolution
+			
+			entity.experiencedTime += w[0] * self.resolution
 
 	def trace(self, eid: str, ticks: int) -> None:
 		ent: Entity = None
@@ -119,7 +121,7 @@ class Spacetime:
 		for i in range(ticks):
 			ct = currentEpoch()
 			print(
-				"\relapsed time: " + stringifyTime(ct - st) + ", proper time: " + str(self.properTime) + " s - " + eid, "at", repr(ent.location), "with velocity", repr(ent.velocity), 
+				"\relapsed time: " + stringifyTime(ct - st) + ", proper time: " + str(self.properTime) + " s - exp. time: " + str(ent.experiencedTime) + ", " + eid, "at", repr(ent.location), "with velocity", repr(ent.velocity), 
 				end=f" ({(i / ticks) * 100:.1f}%)" + (" " * 10)
 			)
 			self.tick(1)

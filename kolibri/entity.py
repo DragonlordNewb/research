@@ -57,6 +57,8 @@ class Entity(ABC):
 		self.restMass = Decimal(restMass)
 		self.charges = {key: Decimal(charges[key]) for key in charges.keys()}
 
+		self.experiencedTime = 0
+
 	@abstractmethod
 	def atoms(self) -> list[Atom]:
 		pass
