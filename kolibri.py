@@ -614,14 +614,14 @@ class Schwarzschild(Metric):
 	def g00(spacetime, particle, ds):
 		w = 1
 		for otherParticle in spacetime.otherParticles(particle):
-			w *= 1 - ((2 * G * otherParticle.mass) / (self.distance(particle.position, otherParticle.position) * c2))
+			w *= 1 - ((2 * G * otherParticle.mass) / (Schwarzschild.distance(particle.position, otherParticle.position) * c2))
 		return Decimal(w)
 
 	@Metric.Component.make
 	def gii(spacetime, particle, ds):
 		w = 1
 		for otherParticle in spacetime.otherParticles(particle):
-			w *= 1 / (1 - ((2 * G * otherParticle.mass) / (self.distance(particle.position, otherParticle.position) * c2)))
+			w *= 1 / (1 - ((2 * G * otherParticle.mass) / (Schwarzschild.distance(particle.position, otherParticle.position) * c2)))
 		return Decimal(w)
 	
 	tensor = [
@@ -630,3 +630,5 @@ class Schwarzschild(Metric):
 		[M_CONST(0), M_CONST(0), gii, M_CONST(0)],
 		[M_CONST(0), M_CONST(0), M_CONST(0), gii]
 	]
+
+	def distance(self)
