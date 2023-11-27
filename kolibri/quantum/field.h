@@ -2,12 +2,14 @@
 
 #include "../util/vec3.h"
 #include "../util/const.h"
+#include <complex>
 
+template <typename T>
 class Field {
 
 	public:
 
-		double*** data;
+		T*** data;
 		double resolution;
 
 		Vec3 size;
@@ -15,23 +17,27 @@ class Field {
 		int ylen;
 		int zlen;
 
-		Field(Vec3 size_, double resolution_): 
-				size(size_),
-				xlen((int)(size.x / resolution)),
-				ylen((int)(size.y / resolution)),
-				zlen((int)(size.z / resolution)) {
-			
-			data = new double**[xlen];
+		Field() {}
+
+		Field(Vec3 size_, double resolution_) {
+			initialize(size_, resolution_);
+		}
+
+		void initialize(Vec3 size_, double resolution_) {
+			size = size_;
+			xlen = (int)(size.x / resolution);
+			ylen = (int)(size.y / resolution);
+			zlen = (int)(size.z / resolution);
+			data = new T**[xlen];
 			for (int x = 0; x < xlen; x++) {
-				data[x] = new double*[ylen];
+				data[x] = new T*[ylen];
 				for (int y = 0; y < ylen; y++) {
-					data[x][y] = new double[zlen];
+					data[x][y] = new T[zlen];
 					for (int z = 0; z < zlen; z++) {
-						data[x][y][z] = (double)(0);
+						data[x][y][z] = T();
 					}
 				}
 			}
-
 		}
 
 		double get(double x, double y, double z) {
@@ -46,7 +52,7 @@ class Field {
 			return get(v.x, v.y, v.z);
 		}
 
-		void set(double x, double y, double z, double value) {
+		void set(double x, double y, double z, T value) {
 			int xl = (int)(x / resolution);
 			int yl = (int)(y / resolution);
 			int zl = (int)(z / resolution);
@@ -54,7 +60,7 @@ class Field {
 			data[xl][yl][zl] = value;
 		}
 
-		void set(Vec3 v, double value) {
+		void set(Vec3 v, T value) {
 			set(v.x, v.y, v.z, value);
 		}
 
