@@ -16,6 +16,7 @@ char ALARM_LAMP = 9;
 unsigned int RAW_DATA[RAW_DATA_ARRAY_SIZE] = {0};
 
 unsigned int stopwatch = 0;
+double last = 0;
 
 struct Result {
   unsigned int sum = 0;
@@ -142,7 +143,7 @@ void loop() {
     while (digitalRead(DATA_TEST) == 1) { stopwatch++; }
     digitalWrite(PWR_LASER, LOW);
     RAW_DATA[i] = stopwatch;
-    delay(50);
+    delay(25);
   }
   Serial.write("done.\n  Calculating results ...");
   res = processRawData();
@@ -150,5 +151,8 @@ void loop() {
   Serial.print(res.sum);
   Serial.write(", avg: ");
   Serial.print(res.avg);
+  Serial.write(", diff: ");
+  Serial.print(res.avg - last);
+  last = res.avg;
   Serial.write("\n\n");
 }
