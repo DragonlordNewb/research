@@ -6,6 +6,9 @@
 
 // --- Setup --- //
 
+// Include required library dht.h, used to manage the temperature sensor.
+#include <dht.h>
+
 // Parameters specified by directive instead of variable to save very 
 // valuable storage space - Arduino Uno has only 2048 B of RAM.
 //
