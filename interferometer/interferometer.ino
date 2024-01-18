@@ -6,9 +6,6 @@
 
 // --- Setup --- //
 
-// Include required library dht.h, used to manage the temperature sensor.
-#include <dht.h>
-
 // Parameters specified by directive instead of variable to save very 
 // valuable storage space - Arduino Uno has only 2048 B of RAM.
 //
@@ -26,8 +23,6 @@
 #define CTRL_DATA 4 // connected to control sensor data output
 #define TEST_PWR 5  // connected to test sensor voltage input
 #define TEST_DATA 6 // connected to test sensor data output
-#define THRM_PWR 7  // connected to thermometer voltage input
-#define THRM_DATA 8 // connected to thermometer data output
 
 // Variables that are used over the course of data collection.
 int readings[READING_COUNT];
@@ -54,11 +49,9 @@ void setup() {
 	pinMode(LASER_PWR, OUTPUT);
 	pinMode(CTRL_PWR, OUTPUT);
 	pinMode(TEST_PWR, OUTPUT);
-	pinMode(THRM_PWR, OUTPUT);
 
 	pinMode(CTRL_DATA, INPUT);
 	pinMode(TEST_DATA, INPUT);
-	pinMode(THRM_DATA, INPUT);
 }
 
 void loop() {
@@ -74,7 +67,7 @@ void loop() {
 
 		for (readingNumber = 0; readingNumber < READING_COUNT; readingNumber++) {
 			// activate the laser,
-			digitalWrite(PWR_LASER, HIGH);
+			digitalWrite(LASER_PWR, HIGH);
 			
 			// wait for the control sensor to trip,
 			while (digitalRead(CTRL_DATA) == 0);
@@ -83,7 +76,7 @@ void loop() {
 			while (digitalRead(TEST_DATA) == 0) { reading++; }
 
 			// then disable the laser,
-			digitalWrite(PWR_LASER, LOW);
+			digitalWrite(LASER_PWR, LOW);
 
 			// record the tick count as a single reading (one of READING_COUNT),
 			readings[readingNumber] = reading;
@@ -115,12 +108,8 @@ void loop() {
 
 	}
 
-	// Report findings and local atmospheric data for reference.
-
-	Serial.write("ticks: ");
+	// Report findings
 	Serial.print(computeDataPoint());
-	Serial.write(" tmp: ");
-	Serial.print(digitalRead(THRM_DATA));
 	Serial.write("\n");
 
 }
