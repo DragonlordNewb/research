@@ -12,7 +12,7 @@
 // These can be changed as needed.
 #define READING_COUNT 100 // how many readings per measurement?
 #define SERIAL_BAUD 9600   // baud rate of serial port?
-#define USING_TEST false   // using the test sensor or just control sensor?
+#define USING_TEST true   // using the test sensor or just control sensor?
 #define READING_DELAY 50   // delay between readings
 
 // Pin numbers specified by directive too.
@@ -25,10 +25,10 @@
 #define TEST_DATA 6 // connected to test sensor data output
 
 // Variables that are used over the course of data collection.
-int readings[READING_COUNT];
-int readingNumber = 0;
-int reading = 0;
-int sum = 0;
+unsigned int readings[READING_COUNT];
+unsigned int readingNumber = 0;
+unsigned int reading = 0;
+unsigned int sum = 0;
 
 // --- Main body --- //
 
@@ -52,28 +52,34 @@ void setup() {
 
 	pinMode(CTRL_DATA, INPUT);
 	pinMode(TEST_DATA, INPUT);
+
+  digitalWrite(CTRL_PWR, HIGH);
+  digitalWrite(TEST_PWR, HIGH);
+
+  Serial.write("using test: ");
+  Serial.print(USING_TEST);
+  Serial.write("\n");
 }
 
 void loop() {
 
 	// Collect interferometric data as well as local atmospheric conditions.
 
-	// Reset the reading, then ...
-	reading = 0;
-
 	if (USING_TEST) {
 
 		// ... if using the test sensor,
 
 		for (readingNumber = 0; readingNumber < READING_COUNT; readingNumber++) {
+      reading = 0;
+
 			// activate the laser,
 			digitalWrite(LASER_PWR, HIGH);
 			
 			// wait for the control sensor to trip,
-			while (digitalRead(CTRL_DATA) == 0);
+			while (digitalRead(CTRL_DATA) == 1);
 
 			// then count ticks until the test sensor trips,
-			while (digitalRead(TEST_DATA) == 0) { reading++; }
+			while (digitalRead(TEST_DATA) == 1) { reading++; }
 
 			// then disable the laser,
 			digitalWrite(LASER_PWR, LOW);
@@ -90,14 +96,16 @@ void loop() {
 		// if using just the control sensor for calibration, 
 
 		for (readingNumber = 0; readingNumber < READING_COUNT; readingNumber++) {
+      reading = 0;
+
 			// activate the laser,
-			digitalWrite(PWR_LASER, HIGH);
+			digitalWrite(LASER_PWR, HIGH);
 
 			// count ticks until the control sensor trips,
-			while (digitalRead(CTRL_DATA) == 0) { reading++; }
+			while (digitalRead(CTRL_DATA) == 1) { reading++; }
 
 			// then disable the laser,
-			digitalWrite(PWR_LASER, LOW);
+			digitalWrite(LASER_PWR, LOW);
 
 			// record the tick count as a single reading (one of READING_COUNT),
 			readings[readingNumber] = reading;
@@ -110,6 +118,6 @@ void loop() {
 
 	// Report findings
 	Serial.print(computeDataPoint());
-	Serial.write("\n");
+	Serial.write("\n\r");
 
 }
