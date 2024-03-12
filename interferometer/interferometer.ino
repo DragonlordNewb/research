@@ -11,9 +11,9 @@
 //
 // These can be changed as needed.
 #define READING_COUNT 100 // how many readings per measurement?
-#define SERIAL_BAUD 9600   // baud rate of serial port?
+#define SERIAL_BAUD 9600  // baud rate of serial port?
 #define USING_TEST true   // using the test sensor or just control sensor?
-#define READING_DELAY 50   // delay between readings
+#define READING_DELAY 50  // delay between readings
 
 // Pin numbers specified by directive too.
 //
@@ -63,7 +63,7 @@ void setup() {
 
 void loop() {
 
-	// Collect interferometric data as well as local atmospheric conditions.
+	// Collect interferometric data.
 
 	if (USING_TEST) {
 
