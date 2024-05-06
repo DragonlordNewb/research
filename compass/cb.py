@@ -20,6 +20,9 @@ class CelestialBody:
 	hasAtmosphere: bool = False
 	atmosphericHeight: mathutil.Scalar = None
 	lowestOrbit: mathutil.Scalar = None
+
+	parent: "CelestialBody" = None
+	parentOrbit: orbit.Orbit = None
 	
 	@staticmethod
 	def fromMass(
@@ -78,6 +81,10 @@ class CelestialBody:
 				if pe <= self.lowestOrbit:
 					return (UNSTABLE, REENTRY)
 				return (STABLE, PARKING)
+
+	def placeInOrbit(self, body: "CelestialBody", parentOrbit: orbit.Orbit) -> None:
+		self.parent = body
+		self.parentOrbit = parentOrbit
 				
 	def orbitFromPositionAndVelocity(self, r: mathutil.Vector3, v: mathutil.Vector3) -> orbit.Orbit:
 		return orbit.Orbi.fromSGPPositionAndVelocity(self.sgp, r, v)
