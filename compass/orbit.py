@@ -3,6 +3,7 @@ import mathutil
 class Orbit:
 
 	sgp: mathutil.Scalar
+	centralBodyMass: mathutil.Scalar
 	
 	specificAngularMomentum: mathutil.Vector3
 	specificOrbitalEnergy: mathutil.Scalar
@@ -19,10 +20,25 @@ class Orbit:
 	
 	@staticmethod
 	def fromSGPPositionAndVelocity(sgp: mathutil.Scalar, r: mathutil.Vector3, v: mathutil.Vector3) -> "Orbit":
-		self.sgp = sgp
-		self.specificOrbitalEnergy = (abs(v) / 2) - (sgp / abs(r))
-		self.specificAngularMomentum = mathutil.Vector3.cross(r, v)
+		orbit = Orbit()
+		orbit.sgp = sgp
+		orbit.centralBodyMass = sgp / mathutil.G
+		orbit.specificOrbitalEnergy = (abs(v) / 2) - (self.sgp / abs(r))
+		orbit.specificAngularMomentum = mathutil.Vector3.cross(r, v)
+		orbit.calculateOrbitalParameters()
+		return orbit
 
+	@staticmethod
+	def fromMassPositionAndVelocity(mass: mathutil.Scalar, r: mathutil.Vector3, v: mathutil.Vector3) -> "Orbit":
+		orbit = Orbit()
+		orbit.centralBodyMass = sgp
+		orbit.sgp = mass * mathutil.G
+		orbit.specificOrbitalEnergy = (abs(v) / 2) - (self.sgp / abs(r))
+		orbit.specificAngularMomentum = mathutil.Vector3.cross(r, v)
+		orbit.calculateOrbitalParameters()
+		return orbit
+
+	def calculateOrbitalParameters() -> None:
 		self.eccentricity = mathutil.sqrt(
 			1 + (
 				(2 * specificOrbitalEnergy * (abs(self.specificAngularMomentum) ** 2))
