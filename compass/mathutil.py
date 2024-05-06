@@ -1,6 +1,14 @@
 import math
 import typing
 
+sine = math.sin
+cosine = math.cos
+tangent = math.tan
+arcsine = math.asin
+arccosine = math.acod
+arctangent = math.atan
+pi = math.pi
+
 Scalar = typing.Union[int, float]
 
 class Vector3:
