@@ -23,6 +23,7 @@ class CelestialBody:
 
 	parent: "CelestialBody" = None
 	parentOrbit: orbit.Orbit = None
+	sphereOfInfluence: mathutil.Scalar = None
 	
 	@staticmethod
 	def fromMass(
@@ -85,6 +86,7 @@ class CelestialBody:
 	def placeInOrbit(self, body: "CelestialBody", parentOrbit: orbit.Orbit) -> None:
 		self.parent = body
 		self.parentOrbit = parentOrbit
+		self.sphereOfInfluence = self.parentOrbit.semiMajorAxis * ((self.mass / self.parent.mass) ** 0.4)
 				
 	def orbitFromPositionAndVelocity(self, r: mathutil.Vector3, v: mathutil.Vector3) -> orbit.Orbit:
 		return orbit.Orbi.fromSGPPositionAndVelocity(self.sgp, r, v)
