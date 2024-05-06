@@ -8,6 +8,8 @@ arcsine = math.asin
 arccosine = math.acod
 arctangent = math.atan
 pi = math.pi
+G = 6.6743e-11
+c = 2.99792458e+8
 
 Scalar = typing.Union[int, float]
 
