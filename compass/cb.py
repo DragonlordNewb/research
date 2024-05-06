@@ -78,3 +78,6 @@ class CelestialBody:
 				if pe <= self.lowestOrbit:
 					return (UNSTABLE, REENTRY)
 				return (STABLE, PARKING)
+				
+	def orbitFromPositionAndVelocity(self, r: mathutil.Vector3, v: mathutil.Vector3) -> orbit.Orbit:
+		return orbit.Orbi.fromSGPPositionAndVelocity(self.sgp, r, v)
