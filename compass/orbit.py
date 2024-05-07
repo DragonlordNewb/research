@@ -58,4 +58,10 @@ class Orbit:
 			self.ascendingNodeLongitude = mathutil.arccosine(n.x / abs(n))
 		else:
 			self.ascendingNodeLongitude = (2 * mathutil.pi) - mathutil.arccosine(n.x / abs(n))
-			
+
+	def calculateInstantaneousDistance(self, angle: mathutil.Scalar) -> mathutil.Scalar:
+		return self.semiLatusRectum / (1 + (self.eccentricity * mathutil.cosine(angle))
+
+	def calculateInstantaneousVelocity(self, angle: mathutil.Scalar) -> mathutil.Scalar:
+		r = self.calculateInstantaneousDistance(angle)
+		return mathutil.sqrt(self.sgp * ((2 / r) - (1 / self.semiMajorAxis)))
