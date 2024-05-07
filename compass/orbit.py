@@ -23,7 +23,7 @@ class Orbit:
 		orbit = Orbit()
 		orbit.sgp = sgp
 		orbit.centralBodyMass = sgp / mathutil.G
-		orbit.specificOrbitalEnergy = (abs(v) / 2) - (self.sgp / abs(r))
+		orbit.specificOrbitalEnergy = (abs(v) / 2) - (sgp / abs(r))
 		orbit.specificAngularMomentum = mathutil.Vector3.cross(r, v)
 		orbit.calculateOrbitalParameters()
 		return orbit
@@ -33,7 +33,7 @@ class Orbit:
 		orbit = Orbit()
 		orbit.centralBodyMass = sgp
 		orbit.sgp = mass * mathutil.G
-		orbit.specificOrbitalEnergy = (abs(v) / 2) - (self.sgp / abs(r))
+		orbit.specificOrbitalEnergy = (abs(v) / 2) - (orbit.sgp / abs(r))
 		orbit.specificAngularMomentum = mathutil.Vector3.cross(r, v)
 		orbit.calculateOrbitalParameters()
 		return orbit
@@ -41,7 +41,7 @@ class Orbit:
 	def calculateOrbitalParameters() -> None:
 		self.eccentricity = mathutil.sqrt(
 			1 + (
-				(2 * specificOrbitalEnergy * (abs(self.specificAngularMomentum) ** 2))
+				(2 * self.specificOrbitalEnergy * (abs(self.specificAngularMomentum) ** 2))
 				/ (sgp ** 2)
 			)
 		)
