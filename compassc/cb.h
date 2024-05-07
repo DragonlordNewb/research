@@ -1,6 +1,8 @@
 #include "orbit.h"
 #include <string>
 
+using namespace std;
+
 namespace cb {
 
     class CelestialBody {
@@ -27,7 +29,11 @@ namespace cb {
                 }
             }
 
-            void placeInOrbit(CelestialBody parentBody, orbit::Orbit parentOrbit, )
+            void placeInOrbit(CelestialBody parentBody, orbit::Orbit orbitAroundParent, double trueAnomalyAroundParent) {
+                parent = &parentBody;
+                parentOrbit = orbitAroundParent;
+                trueAnomaly = trueAnomalyAroundParent;
+            }
 
     };
 
