@@ -1,6 +1,13 @@
-#include "mathutil.h"
+#include "util.h"
 
 namespace orbit {
+
+    enum OrbitType { Escape, Parking, Reentry, Aerobrake, Collision };
+
+    struct Situation(
+        string body;
+        OrbitType orbitType;
+    )
 
     class Orbit {
 
@@ -21,6 +28,8 @@ namespace orbit {
             
             double inclination;
             double ascendingNodeLongitude;
+
+            Orbit() {}
             
             Orbit(double sgp, vecs::XYZ r, vecs::XYZ v): sgp(sgp), centralBodyMass(sgp / consts::G) {
                 specificOrbitalEnergy = (v.getLength() / 2) - (sgp / r.getLength());

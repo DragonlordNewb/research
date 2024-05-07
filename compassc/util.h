@@ -7,6 +7,17 @@ namespace consts {
     const double pi = 3.14159265358979;
 }
 
+namespace uniconv {
+    double m2km(double m) { return m / 1000; }
+    double m2Mm(double m) { return m / 1000000; }
+    double km2Mm(double km) { return km / 1000; }
+    double m2AU(double m) { return m / 149598073000; }
+    double km2AU(double km) { return km / 149598073; }
+    double Mm2AU(double Mm) { return Mm / 149598.073; }
+    double m2ly(double m) { return m / 9460730472580800; }
+    double km2ly(double m) { return km / 9460730472580.8; }
+}
+
 namespace vecs {
 
     // 3 different types of vectors: rectangular, spherical, cylindrical
