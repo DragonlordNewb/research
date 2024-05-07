@@ -1,5 +1,5 @@
-import mathutil
-import orbit
+from compassp import mathutil
+from compassp import orbit
 
 DEFAULT_NEW_NAME = "New Celestial Body"
 
@@ -38,9 +38,10 @@ class CelestialBody:
 		cb.radius = radius
 		cb.sgp = mass * mathutil.G
 		if atmosphericHeight is not None:
-			hasAtmosphere = True
-			self.atmosphericHeight = atmosphericHeight
-			self.lowestOrbit = self.atmosphericHeight + self.radius
+			cb.hasAtmosphere = True
+			cb.atmosphericHeight = atmosphericHeight
+			cb.lowestOrbit = cb.atmosphericHeight + cb.radius
+		return cb
 		
 	@staticmethod 
 	def fromSGP(
@@ -55,9 +56,10 @@ class CelestialBody:
 		cb.radius = radius
 		cb.sgp = sgp
 		if atmosphericHeight is not None:
-			hasAtmosphere = True
-			self.atmosphericHeight = atmosphericHeight
-			self.lowestOrbit = self.atmosphericHeight + self.radius
+			cb.hasAtmosphere = True
+			cb.atmosphericHeight = atmosphericHeight
+			cb.lowestOrbit = cb.atmosphericHeight + cb.radius
+		return cb
 			
 	def orbitType(self, o: orbit.Orbit) -> tuple[str, str]:
 		pe = o.periapsis
