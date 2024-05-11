@@ -15,7 +15,7 @@ namespace uniconv {
     double km2AU(double km) { return km / 149598073; }
     double Mm2AU(double Mm) { return Mm / 149598.073; }
     double m2ly(double m) { return m / 9460730472580800; }
-    double km2ly(double m) { return km / 9460730472580.8; }
+    double km2ly(double km) { return km / 9460730472580.8; }
 }
 
 namespace vecs {
