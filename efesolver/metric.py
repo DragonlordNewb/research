@@ -47,6 +47,7 @@ class Metric:
 				)
 			if not quiet:
 				print("\rSuccessfully computed Christoffel symbol (ikl = " + str(i) + str(k) + str(l) + ").")
+			s = sympy.simplify(s)
 			self.cachedChristoffelSymbols[i][k][l] = s
 			return s
 		
@@ -67,6 +68,7 @@ class Metric:
 					+ (self.christoffel(k, i, m, True) * self.christoffel(m, j, k, True))
 			if not quiet:
 				print("\rSuccessfully computed Ricci tensor component. (ij = " + str(i) + str(j) + ")")
+			s = sympy.simplify(s)
 			self.cachedRicciComponents[i][j] = s
 			return s
 		
@@ -83,5 +85,6 @@ class Metric:
 				for j in range(4):
 					s += self.sup(i, j) * self.ricci(i, j, True)
 			print("\rSuccessfully computed scalar curvature.")
+			s = sympy.simplify(s)
 			self.scalarCurvature = s
 			return s
